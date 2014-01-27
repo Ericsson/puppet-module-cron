@@ -1,0 +1,10 @@
+name    'ericsson-cron'
+version '0.1.0'
+source ''
+author 'Nasredine Bentoumi'
+license ''
+summary 'Manage cron'
+description 'Manage cron'
+project_page ''
+
+dependency 'puppetlabs/stdlib', '>= 3.2.0'
