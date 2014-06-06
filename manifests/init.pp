@@ -29,7 +29,7 @@ class cron (
 
   # Check the client os to define the package name and service name
 
-  case $::operatingsystem {
+  case $::osfamily {
     ubuntu, suse: {$package_name = 'cron' $service_name = 'cron' }
     redhat, centos: {$package_name = 'crontabs' $service_name = 'crond' }
     default: {fail("Module cron does not support osfamily: ${::osfamily}")}
@@ -59,7 +59,7 @@ class cron (
 
   file {'cron_allow':
     ensure  => $cron_allow ? {
-      true    => present,
+      'true'    => present,
       default => absent,
     },
     path    => $cron_allow_path,
