@@ -33,6 +33,9 @@ define cron::fragment (
 
   include cron
   
+  if ! ($ensure_cron in [ "present", "absent" ]) {
+     fail("cron::fragment:ensure_cron is $ensure_cron and must be absent or present")
+  }
   case $type {
   'd':                                  { $cron_mode = 644 }
   'daily','weekly','monthly','yearly':  { $cron_mode = 755 }
