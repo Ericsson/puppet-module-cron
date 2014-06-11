@@ -1,9 +1,9 @@
 ###
-### Crontab File managed by Puppet <%puppetversion -%>
+### Crontab File managed by Puppet 
 ### DOT NOT change it manually
 ###
-
 ## Variables
+
 <% if (crontab_vars.empty?)  -%>
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
@@ -28,8 +28,17 @@ HOME=/
 <% if (!crontab_tasks.empty?)  -%>
 <% crontab_tasks.sort.each do |key,val| -%>
 # <%= key %>
-<% val.each do |crontask|  -%>
- <%= crontask %>
+<% val.each do |crontask_value|  -%>
+<%crontask=crontask_value.split(" ")%>
+<%
+minute=crontask[0]
+hour=crontask[1]
+day_month=crontask[2]
+month=crontask[3]
+day_week=crontask[4]
+username=crontask[5]
+%>
+<%= crontask_value%>
 <% end -%>
 <% end -%>
 <% end -%>
