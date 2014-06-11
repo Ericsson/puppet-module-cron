@@ -32,7 +32,7 @@ define cron::fragment (
 ) {
 
   include cron
-
+  
   case $type {
   'd':                                  { $cron_mode = 644 }
   'daily','weekly','monthly','yearly':  { $cron_mode = 755 }
