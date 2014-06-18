@@ -85,9 +85,6 @@ class cron (
   if $cron_files != undef {
    create_resources(cron::fragment,$cron_files)
   }
-  #if $var_spool_cron != undef {
-  # create_resources(cron::var_spool_cron,$var_spool_cron)
-  #}
   if ($cron_tasks != '') {
    validate_hash($cron_tasks)
   }
