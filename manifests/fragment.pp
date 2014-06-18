@@ -36,9 +36,10 @@ define cron::fragment (
   if ! ($ensure_cron in [ "present", "absent" ]) {
      fail("cron::fragment:ensure_cron is $ensure_cron and must be absent or present")
   }
+  validate_string($cron_content)
   case $type {
-  'd':                                  { $cron_mode = 644 }
-  'daily','weekly','monthly','yearly':  { $cron_mode = 755 }
+  'd':                                  { $cron_mode = 0644 }
+  'daily','weekly','monthly','yearly':  { $cron_mode = 0755 }
   default: {fail("Valid values are d, daily, weekly, monthly, yearly")}
   }
 

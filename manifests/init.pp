@@ -28,7 +28,7 @@ class cron (
   $cron_allow_path  = '/etc/cron.allow',
   $cron_deny_path   = '/etc/cron.deny',
   $cron_files       = undef,
-  $var_spool_cron   = undef,
+  #$var_spool_cron   = undef,
   $cron_allow_users = undef,
   $cron_deny_users  = undef,
   $crontab_vars     = '',
@@ -74,7 +74,7 @@ class cron (
    validate_array($cron_allow_users)
    $cron_allow='present'
   } else { 
-  $cron_allow_real=$cron_allow
+   $cron_allow_real=$cron_allow
   }
   if $cron_deny_users != undef {
    validate_array($cron_deny_users)
@@ -85,9 +85,9 @@ class cron (
   if $cron_files != undef {
    create_resources(cron::fragment,$cron_files)
   }
-  if $var_spool_cron != undef {
-   create_resources(cron::var_spool_cron,$var_spool_cron)
-  }
+  #if $var_spool_cron != undef {
+  # create_resources(cron::var_spool_cron,$var_spool_cron)
+  #}
   if ($cron_tasks != '') {
    validate_hash($cron_tasks)
   }
