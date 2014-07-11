@@ -53,19 +53,11 @@ class cron (
   }
 
 # validation
-  if ! ($ensure_state in [ running, stopped ]) {
-    fail("cron::ensure_state is ${ensure_state} and must be running or stopped")
-  }
+  validate_re($ensure_state, '^(running)|(stopped)$', "cron::ensure_state is ${ensure_state} and must be running or stopped")
+  validate_re($package_ensure, '^(present)|(absent)$', "cron::package_ensure is ${package_ensure} and must be absent or present")
+  validate_re($cron_allow, '^(present)|(absent)$', "cron::cron_allow is ${cron_allow} and must be absent or present")
+  validate_re($cron_deny, '^(present)|(absent)$', "cron::cron_deny is ${cron_deny} and must be absent or present")
 
-  if ! ($package_ensure in [ 'present', 'absent' ]) {
-    fail("cron::package_ensure is ${package_ensure} and must be absent or present")
-  }
-  if ! ($cron_allow in [ 'present', 'absent' ]) {
-    fail("cron::cron_allow is ${cron_allow} and must be absent or present")
-  }
-  if ! ($cron_deny in [ 'present', 'absent' ]) {
-    fail("cron::cron_deny is ${cron_deny} and must be absent or present")
-  }
   case type($enable_cron) {
     'string': {
       validate_re($enable_cron, '^(true|false)$', "cron::enable_cron may be either 'true' or 'false' and is set to <${enable_cron}>")
@@ -80,7 +72,7 @@ class cron (
   }
   if $cron_allow_users != undef {
     validate_array($cron_allow_users)
-    $cron_allow='present'
+    $cron_allow_real='present'
   } else {
     $cron_allow_real=$cron_allow
   }
