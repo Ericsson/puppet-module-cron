@@ -36,9 +36,9 @@ describe 'cron::fragment' do
         :lsbmajdistrelease => '6',
       }
     }
-    let(:params) { 
+    let(:params) {
       { :content => true
-      } 
+      }
     }
 
     it 'should fail' do
@@ -55,11 +55,11 @@ describe 'cron::fragment' do
         :lsbmajdistrelease => '6',
       }
     }
-    
-    let(:params) { 
+
+    let(:params) {
       { :ensure_cron => 'absent',
-        :type        => 'd', 
-      } 
+        :type        => 'd',
+      }
     }
 
     it { should contain_class('cron') }
