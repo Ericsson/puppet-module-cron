@@ -48,7 +48,7 @@ class cron (
       $service_name = 'crond'
     }
     default: {
-      fail("cron supports RedHat, CentOS, Suse and Ubuntu. Detected osfaimly is <${::osfamily}>.")
+      fail("cron supports RedHat, CentOS, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
     }
   }
 
