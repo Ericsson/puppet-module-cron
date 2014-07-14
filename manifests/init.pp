@@ -85,11 +85,11 @@ class cron (
   if $cron_files != undef {
     create_resources(cron::fragment,$cron_files)
   }
-  if ($cron_tasks != '') {
-    validate_hash($cron_tasks)
+  if ($crontab_tasks != '') {
+    validate_hash($crontab_tasks)
   }
-  if ($cron_vars != '') {
-    validate_hash($cron_vars)
+  if ($crontab_vars != '') {
+    validate_hash($crontab_vars)
   }
 # End of validation
 
@@ -132,7 +132,7 @@ class cron (
     ensure    => $ensure_state,
     enable    => $enable_cron_real,
     name      => $service_name,
-    require   => File[$crontab_path],
+    require   => File['crontab'],
     subscribe => File['crontab'],
   }
 
