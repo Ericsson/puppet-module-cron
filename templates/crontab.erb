@@ -1,5 +1,5 @@
 ###
-### Crontab File managed by Puppet 
+### Crontab File managed by Puppet
 ### DOT NOT change it manually
 ###
 ## Variables
@@ -29,7 +29,7 @@ HOME=/
 <% crontab_tasks.sort.each do |key,val| -%>
 # <%= key %>
 <% val.each do |crontask_value|  -%>
-<%crontask=crontask_value.split(" ")%>
+<%crontask=crontask_value.split(" ")-%>
 <%
 minute=crontask[0]
 hour=crontask[1]
@@ -37,7 +37,7 @@ day_month=crontask[2]
 month=crontask[3]
 day_week=crontask[4]
 username=crontask[5]
-%>
+-%>
 <%= crontask_value%>
 <% end -%>
 <% end -%>
