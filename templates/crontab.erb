@@ -4,7 +4,7 @@
 ###
 ## Variables
 
-<% if (crontab_vars.empty?)  -%>
+<% if @crontab_vars == nil  -%>
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
@@ -25,7 +25,7 @@ HOME=/
 # |  |  |  |  |
 # *  *  *  *  * username command-to-be-executed
 
-<% if (!crontab_tasks.empty?)  -%>
+<% if @crontab_tasks != nil  -%>
 <% crontab_tasks.sort.each do |key,val| -%>
 # <%= key %>
 <% val.each do |crontask_value|  -%>
