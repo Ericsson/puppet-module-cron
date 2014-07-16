@@ -28,11 +28,10 @@ class cron (
   $cron_allow_path  = '/etc/cron.allow',
   $cron_deny_path   = '/etc/cron.deny',
   $cron_files       = undef,
-  #$var_spool_cron   = undef,
   $cron_allow_users = undef,
   $cron_deny_users  = undef,
-  $crontab_vars     = '',
-  $crontab_tasks    = '',
+  $crontab_vars     = undef,
+  $crontab_tasks    = undef,
 
 ) {
 
@@ -85,10 +84,10 @@ class cron (
   if $cron_files != undef {
     create_resources(cron::fragment,$cron_files)
   }
-  if ($crontab_tasks != '') {
+  if $crontab_tasks != undef {
     validate_hash($crontab_tasks)
   }
-  if ($crontab_vars != '') {
+  if $crontab_vars != undef {
     validate_hash($crontab_vars)
   }
 # End of validation
