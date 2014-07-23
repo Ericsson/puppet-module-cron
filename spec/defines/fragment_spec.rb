@@ -1,66 +1,60 @@
 require 'spec_helper'
 describe 'cron::fragment' do
 
-  context 'create file from content' do
-    let(:title) { 'example' }
-    let(:params) {
-      { :cron_content => '* * * * * root command',
-        :type    => 'd',
-        :ensure_cron => 'present'
-      }
-    }
-    let(:facts) {
-      {
-        :osfamily          => 'RedHat',
-      }
-    }
+  let(:title) { 'example' }
+  let(:facts) {{
+    :osfamily => 'RedHat',
+  }}
+
+
+  context 'create file in /etc/cron.d/ from cron_content' do
+    let(:params) {{
+      :cron_content => '* * * * * root command',
+      :type         => 'd',
+      :ensure_cron  => 'present'
+    }}
 
     it { should contain_class('cron') }
 
     it {
       should contain_file('/etc/cron.d/example').with({
-        'ensure'  => 'present',
-        'owner'   => 'root',
-        'group'   => 'root',
-        'mode'    => '0644',
+        'ensure' => 'present',
+        'owner'  => 'root',
+        'group'  => 'root',
+        'mode'   => '0644',
       })
     }
-    it { should contain_file('/etc/cron.d/example').with_content(%{* * * * * root command})
-    }
+    it { should contain_file('/etc/cron.d/example').with_content(%{* * * * * root command}) }
   end
 
-  context 'with content specified as invalid string' do
-    let(:title) { 'example' }
-    let(:facts) {
-      { :osfamily          => 'RedHat',
-        :lsbmajdistrelease => '6',
-      }
-    }
-    let(:params) {
-      { :content => true
-      }
-    }
+  ['daily','weekly','monthly','yearly'].each do |value|
+    context "create file in /etc/cron.#{value}/ from cron_content" do
+      let(:title) { "example-#{value}" }
+      let(:params) {{
+        :cron_content => '* * * * * root command',
+        :type         => "#{value}",
+        :ensure_cron  => 'present',
+      }}
 
-    it 'should fail' do
-      expect {
-        should contain_class('cron')
-      }.to raise_error(Puppet::Error)
+      it { should contain_class('cron') }
+
+      it {
+        should contain_file("/etc/cron.#{value}/example-#{value}").with({
+          'ensure' => 'present',
+          'owner'  => 'root',
+          'group'  => 'root',
+          'mode'   => '0755',
+        })
+      }
+      it { should contain_file("/etc/cron.#{value}/example-#{value}").with_content(%{* * * * * root command}) }
     end
   end
 
-  context 'with ensure specified as absent' do
-    let(:title) { 'example' }
-    let(:facts) {
-      { :osfamily          => 'RedHat',
-        :lsbmajdistrelease => '6',
-      }
-    }
-
-    let(:params) {
-      { :ensure_cron => 'absent',
-        :type        => 'd',
-      }
-    }
+  context 'with ensure_cron specified as <absent>' do
+    let(:params) {{
+      :ensure_cron => 'absent',
+      :type        => 'd',
+    }}
 
     it { should contain_class('cron') }
 
@@ -74,22 +68,41 @@ describe 'cron::fragment' do
     }
   end
 
-  ['true',true,'present'].each do |value|
-    context "with ensure specified as invalid value (#{value})" do
-      let(:title) { 'example' }
-      let(:facts) {
-        { :osfamily          => 'RedHat',
-          :lsbmajdistrelease => '6',
-        }
-      }
-      let(:params) { { :ensure => value } }
+  context 'with cron_content specified as invalid boolean <true>' do
+    let(:params) {{
+      :cron_content => true
+    }}
+
+    it 'should fail' do
+      expect {
+        should contain_class('cron')
+      }.to raise_error(Puppet::Error,/is not a string./)
+    end
+  end
+
+  context 'with type specified as invalid string <biweekly>' do
+    let(:params) {{
+      :type => 'biweekly'
+    }}
+
+    it 'should fail' do
+      expect {
+        should contain_class('cron')
+      }.to raise_error(Puppet::Error,/Valid values are d, daily, weekly, monthly, yearly/)
+    end
+  end
+
+  ['true',true,'false','delete'].each do |value|
+    context "with ensure_cron specified as invalid value <#{value}>" do
+      let(:params) {{
+        :ensure_cron => value
+      }}
 
       it 'should fail' do
         expect {
           should contain_class('cron')
-        }.to raise_error(Puppet::Error)
+        }.to raise_error(Puppet::Error,/cron::fragment::ensure_cron is #{value} and must be absent or present/)
       end
     end
   end
 end
-

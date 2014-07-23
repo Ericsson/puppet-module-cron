@@ -252,10 +252,10 @@ describe 'cron' do
 
 # TODO: test for cron_files
 
-        context 'where cron_allow_users is <[ \'nasredine\', \'phil\' ]>' do
+        context 'where cron_allow_users is <[ \'Tintin\', \'Milou\' ]>' do
           let :params do
             {
-              :cron_allow_users => [ 'nasredine', 'phil', ],
+              :cron_allow_users => [ 'Tintin', 'Milou', ],
             }
           end
 
@@ -270,7 +270,7 @@ describe 'cron' do
             })
           }
           it { should contain_file('cron_allow').with_content(/^# File managed by puppet\n# Do not edit manually$/) }
-          it { should contain_file('cron_allow').with_content(/^nasredine\nphil$/) }
+          it { should contain_file('cron_allow').with_content(/^Tintin\nMilou$/) }
         end
 
         context 'where cron_deny_users is <[ \'nobody\', \'anyone\' ]>' do
@@ -318,13 +318,11 @@ describe 'cron' do
           it { should contain_file('crontab').with_content(/^MAILTO=operator\nSHELL=\/bin\/tcsh$/) }
         end
 
-# TODO: test for crontab_tasks, see hashed out line below
-
-        context 'where crontab_tasks is <{ spec_test => \'42 * * * * nobody\' }>' do
+        context 'where crontab_tasks is <{ spec_test => \'42 * * * * nobody echo Hello_World\' }>' do
           let :params do
             {
               :crontab_tasks => {
-                'spec_test' => '42 * * * * nobody',
+                'spec_test' => '42 * * * * nobody echo Hello_World',
               }
             }
           end
@@ -340,8 +338,7 @@ describe 'cron' do
             })
           }
           it { should contain_file('crontab').with_content(/^### Crontab File managed by Puppet\n### DOT NOT change it manually$/) }
-          it { should contain_file('crontab').with_content(/^# spec_test$/) }
-          # it { should contain_file('crontab').with_content(/^42 * * * * nobody$/) }
+          it { should contain_file('crontab').with_content(/^# spec_test\n42 \* \* \* \* nobody echo Hello_World$/) }
 
         end
 
