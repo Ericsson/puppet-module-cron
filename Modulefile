@@ -1,4 +1,4 @@
-name    'nasredine-cron'
+name    'ericsson-cron'
 version '0.1.0'
 source ''
 author 'Nasredine Bentoumi'
