@@ -318,11 +318,11 @@ describe 'cron' do
           it { should contain_file('crontab').with_content(/^MAILTO=operator\nSHELL=\/bin\/tcsh$/) }
         end
 
-        context 'where crontab_tasks is <{ spec_test => \'Hello_World\' }>' do
+        context 'where crontab_tasks is <{ spec_test => [ \'task1\', \'task2\' ]>' do
           let :params do
             {
               :crontab_tasks => {
-                'spec_test' => 'Hello_World',
+                'spec_test' => [ 'task1', 'task2', ],
               }
             }
           end
@@ -338,7 +338,7 @@ describe 'cron' do
             })
           }
           it { should contain_file('crontab').with_content(/^### Crontab File managed by Puppet\n### DOT NOT change it manually$/) }
-          it { should contain_file('crontab').with_content(/^# spec_test\nHello_World$/) }
+          it { should contain_file('crontab').with_content(/^# spec_test\ntask1\ntask2$/) }
         
        end
 
