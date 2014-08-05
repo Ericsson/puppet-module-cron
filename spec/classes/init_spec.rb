@@ -318,29 +318,29 @@ describe 'cron' do
           it { should contain_file('crontab').with_content(/^MAILTO=operator\nSHELL=\/bin\/tcsh$/) }
         end
 
-        #context 'where crontab_tasks is <{ spec_test => \'42 1 1 1 1 nobody echo Hello_World\' }>' do
-        #  let :params do
-        #    {
-        #      :crontab_tasks => {
-        #        'spec_test' => '42 1 1 1 1 nobody echo Hello_World',
-        #      }
-        #    }
-        #  end
-        # 
-        #  it {
-        #    should contain_file('crontab').with({
-        #      'ensure'  => 'present',
-        #      'path'    => '/etc/crontab',
-        #      'owner'   => 'root',
-        #      'group'   => 'root',
-        #      'mode'    => '0644',
-        #      'require' => "Package[#{v[:package_name]}]",
-        #    })
-        #  }
-        #  it { should contain_file('crontab').with_content(/^### Crontab File managed by Puppet\n### DOT NOT change it manually$/) }
-        #  it { should contain_file('crontab').with_content(/^# spec_test\n42 1 1 1 1 nobody echo Hello_World$/) }
-        #
-        #end
+        context 'where crontab_tasks is <{ spec_test => \'42 1 1 1 1 nobody echo Hello_World\' }>' do
+          let :params do
+            {
+              :crontab_tasks => {
+                'spec_test' => '42 1 1 1 1 nobody echo Hello_World',
+              }
+            }
+          end
+         
+          it {
+            should contain_file('crontab').with({
+              'ensure'  => 'present',
+              'path'    => '/etc/crontab',
+              'owner'   => 'root',
+              'group'   => 'root',
+              'mode'    => '0644',
+              'require' => "Package[#{v[:package_name]}]",
+            })
+          }
+          it { should contain_file('crontab').with_content(/^### Crontab File managed by Puppet\n### DOT NOT change it manually$/) }
+          #it { should contain_file('crontab').with_content(/^# spec_test\n42 1 1 1 1 nobody echo Hello_World$/) }
+        
+       end
 
       end
     end
