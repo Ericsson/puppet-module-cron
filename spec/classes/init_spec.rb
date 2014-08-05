@@ -322,7 +322,7 @@ describe 'cron' do
           let :params do
             {
               :crontab_tasks => {
-                'spec_test' => '42 1 1 1 1 nobody echo Hello_World',
+                'spec_test' => "42 1 1 1 1 nobody echo Hello_World",
               }
             }
           end
