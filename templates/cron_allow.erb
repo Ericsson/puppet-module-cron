@@ -1,0 +1,7 @@
+# File managed by puppet
+# Do not edit manually
+<% if @cron_allow_users -%>
+<% [cron_allow_users].flatten.each do |user| -%>
+<%= user %>
+<% end -%>
+<% end -%>
