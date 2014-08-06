@@ -318,15 +318,15 @@ describe 'cron' do
           it { should contain_file('crontab').with_content(/^MAILTO=operator\nSHELL=\/bin\/tcsh$/) }
         end
 
-        context 'where crontab_tasks is <{ spec_test => [ \'42 * * * * nobody echo task1\', \'42 * * * * nobody echo task2\' ]>' do
+        context 'where crontab_tasks is <{ spec_test => [ \'42 * * * * nobody echo task1\' ]>' do
           let :params do
             {
               :crontab_tasks => {
-                'spec_test' => [ '42 * * * * nobody echo task1', '42 * * * * nobody echo task2', ],
+                'spec_test' => [ '42 * * * * nobody echo task1' ],
               }
             }
           end
-         
+
           it {
             should contain_file('crontab').with({
               'ensure'  => 'present',
@@ -338,8 +338,8 @@ describe 'cron' do
             })
           }
           it { should contain_file('crontab').with_content(/^### Crontab File managed by Puppet\n### DOT NOT change it manually$/) }
-          it { should contain_file('crontab').with_content(/^# spec_test\n42 \* \* \* \* nobody echo task1\n42 \* \* \* \* nobody echo task2$/) }
-        
+          it { should contain_file('crontab').with_content(/^# spec_test\n42 \* \* \* \* nobody echo task1$/) }
+
        end
 
       end
