@@ -10,5 +10,5 @@ rvm:
 - 2.0.0
 language: ruby
 before_script: 'gem install --no-ri --no-rdoc bundler'
-script: 'bundle exec rake lint'
+script: 'puppet-lint  --log-format %{filename}.%{line}.%{column}.%{message}.%{check} manifests/'
 gemfile: Gemfile
