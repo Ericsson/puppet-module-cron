@@ -1,21 +1,7 @@
-#-----------------------------------------------------------------------------#
-# Class: cron
+# ## Class: cron ##
 #
 # This module manages cron
 #
-# Parameters: none
-#
-# Actions:
-#
-#
-#
-# Sample Usage:
-#
-# cron::ensure_state: 'running' => ensure the service started, this is
-# the default value (can be set to 'stopped')
-# cron::enable: 'false' => set the service to start during the server boot,
-# default value = 'true'.
-#----------------------------------------------------------------------------#
 
 class cron (
   #Default values

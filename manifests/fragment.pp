@@ -1,26 +1,7 @@
-#--------------------------------------------#
+# == Class cron::fragment
 #
 # manage cron jobs in separate files
-# call with ensure_cron=> absent to delete the job
 #
-#--------------------------------------------#
-# usage in manifest
-# cron::cron_job_file { 'file_name':
-#   ensure_cron  => 'present',
-#   type         => 'd',
-#   cron_content => 'script | cron'
-# }
-#
-# usage in Hiera
-# cron::cron_files:
-#   'file_name':
-#     ensure_cron: 'present'
-#     type:        'daily'
-#     cron_content: |-
-#       #!/bin/bash
-#       # This File is managed by puppet
-#       echo "Hello World"
-#-------------------------------------------#
 
 define cron::fragment (
   $ensure_cron  = 'absent',
