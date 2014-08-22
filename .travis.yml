@@ -10,5 +10,7 @@ rvm:
 - 2.0.0
 language: ruby
 before_script: 'gem install --no-ri --no-rdoc bundler'
+script: 'puppet-lint manifests/init.pp'
+script: 'puppet-lint manifests/fragment.pp'
 script: 'bundle exec rake validate && bundle exec rake lint && SPEC_OPTS="--format documentation" bundle exec rake spec'
 gemfile: Gemfile
