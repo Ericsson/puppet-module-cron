@@ -92,16 +92,16 @@ Define crontab tasks. valid value is hash.
 
 ## Sample usage:
 
-* define crontab variables
-
+define crontab variables
+<pre>
 cron::crontab_vars:
   SHELL: /bin/bash
   PATH: /sbin:/bin:/usr/sbin:/usr/bin
   MAILTO: root
   HOME: /root
-
-* create /etc/cron.daily/daily_task
-
+</pre>
+create /etc/cron.daily/daily_task
+<pre>
 cron::cron_files:
      'daily_task':
        ensure_cron: 'present'
@@ -112,23 +112,30 @@ cron::cron_files:
             script
             .
             EOF
-* manage /etc/cron.allow
+</pre>
 
+manage /etc/cron.allow
+
+<pre>
 cron::cron_allow: 'true'
 cron::cron_allow_users:
      - user1
 
-* manage /etc/cron.deny
+</pre>
 
+manage /etc/cron.deny
+<pre>
 cron::cron_deny: 'present'
 cron::cron_deny_users:
      - user1
+</pre>
 
-* manage /etc/crontab
+manage /etc/crontab
+<pre>
 cron::crontab_tasks:
    'task1':
     - "* 12 * * 7 username echo 'Hello World'"
     - "2 2 * * 6 username echo 'tes'"
    'task2':
     - "* 6 * * 7 root echo 'test'"
-
+</pre>
