@@ -2,7 +2,6 @@
 #
 # manage cron jobs in separate files
 #
-
 define cron::fragment (
   $ensure_cron  = 'absent',
   $type         = 'daily',

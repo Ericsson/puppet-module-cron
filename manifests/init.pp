@@ -2,7 +2,6 @@
 #
 # This module manages cron
 #
-
 class cron (
   #Default values
   $enable_cron      = true,
