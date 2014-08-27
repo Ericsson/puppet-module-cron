@@ -8,12 +8,6 @@ describe 'cron' do
         :package_name => 'crontabs',
         :service_name => 'crond',
       },
-    'CentOS' =>
-      {
-        :osfamily     => 'CentOS',
-        :package_name => 'crontabs',
-        :service_name => 'crond',
-      },
     'Suse' =>
       {
         :osfamily     => 'Suse',
