@@ -27,12 +27,12 @@ class cron (
       $package_name = 'cron'
       $service_name = 'cron'
     }
-    'RedHat', 'Centos': {
+    'RedHat': {
       $package_name = 'crontabs'
       $service_name = 'crond'
     }
     default: {
-      fail("cron supports RedHat, CentOS, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
+      fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
     }
   }
 
