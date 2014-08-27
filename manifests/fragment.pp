@@ -34,7 +34,4 @@ define cron::fragment (
     mode    => $cron_mode,
     require => Package[$cron::package_name],
   }
-
-
 }
-
