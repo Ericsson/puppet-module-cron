@@ -97,7 +97,7 @@ class cron (
     require => Package[$package_name],
   }
 
-  package {'cron':
+  package {$package_name:
     ensure => $package_ensure,
     name   => $package_name,
   }
