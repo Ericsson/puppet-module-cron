@@ -54,7 +54,7 @@ describe 'cron' do
         }
 
         it {
-          should contain_package('cron').with({
+          should contain_package("#{v[:package_name]}").with({
             'ensure' => 'present',
             'name'   => v[:package_name],
           })
@@ -120,7 +120,7 @@ describe 'cron' do
           end
 
           it {
-            should contain_package('cron').with({
+            should contain_package("#{v[:package_name]}").with({
               'ensure' => 'absent',
               'name'   => v[:package_name],
             })
