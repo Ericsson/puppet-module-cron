@@ -1,9 +1,8 @@
-# ## Class: cron ##
+# == Class: cron
 #
 # This module manages cron
 #
 class cron (
-  #Default values
   $enable_cron      = true,
   $package_ensure   = 'present',
   $ensure_state     = 'running',
@@ -17,7 +16,6 @@ class cron (
   $cron_deny_users  = undef,
   $crontab_vars     = undef,
   $crontab_tasks    = undef,
-
 ) {
 
   # Check the client os to define the package name and service name
@@ -36,7 +34,7 @@ class cron (
     }
   }
 
-# validation
+  # Validation
   validate_re($ensure_state, '^(running)|(stopped)$', "cron::ensure_state is ${ensure_state} and must be running or stopped")
   validate_re($package_ensure, '^(present)|(absent)$', "cron::package_ensure is ${package_ensure} and must be absent or present")
   validate_re($cron_allow, '^(present)|(absent)$', "cron::cron_allow is ${cron_allow} and must be absent or present")
@@ -75,9 +73,9 @@ class cron (
   if $crontab_vars != undef {
     validate_hash($crontab_vars)
   }
-# End of validation
+  # End of validation
 
-  file {'cron_allow':
+  file { 'cron_allow':
     ensure  => $cron_allow_real,
     path    => $cron_allow_path,
     owner   => root,
@@ -87,7 +85,7 @@ class cron (
     require => Package[$package_name],
   }
 
-  file {'cron_deny':
+  file { 'cron_deny':
     ensure  => $cron_deny_real,
     path    => $cron_deny_path,
     owner   => root,
@@ -97,12 +95,12 @@ class cron (
     require => Package[$package_name],
   }
 
-  package {$package_name:
+  package { $package_name:
     ensure => $package_ensure,
     name   => $package_name,
   }
 
-  file {'crontab':
+  file { 'crontab':
     ensure  => present,
     path    => $crontab_path,
     owner   => root,
@@ -112,13 +110,11 @@ class cron (
     require => Package[$package_name],
   }
 
-  service {'cron':
+  service { 'cron':
     ensure    => $ensure_state,
     enable    => $enable_cron_real,
     name      => $service_name,
     require   => File['crontab'],
     subscribe => File['crontab'],
   }
-
 }
-

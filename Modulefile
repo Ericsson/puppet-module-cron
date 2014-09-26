@@ -1,10 +1,10 @@
 name    'ericsson-cron'
 version '0.1.0'
-source ''
+source 'git://github.com/Ericsson/puppet-module-cron.git'
 author 'Nasredine Bentoumi'
-license ''
+license 'Apache License, Version 2.0'
 summary 'Manage cron'
 description 'Manage cron'
-project_page ''
+project_page 'https://github.com/Ericsson/puppet-module-cron'
 
 dependency 'puppetlabs/stdlib', '>= 3.2.0'

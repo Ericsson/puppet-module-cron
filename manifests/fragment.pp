@@ -1,6 +1,6 @@
-# == Class cron::fragment
+# == Define: cron::fragment
 #
-# manage cron jobs in separate files
+# Manage cron jobs in separate files
 #
 define cron::fragment (
   $ensure_cron  = 'absent',
