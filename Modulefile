@@ -1,5 +1,5 @@
 name    'ericsson-cron'
-version '0.1.0'
+version '1.0.0'
 source 'git://github.com/Ericsson/puppet-module-cron.git'
 author 'Nasredine Bentoumi'
 license 'Apache License, Version 2.0'
