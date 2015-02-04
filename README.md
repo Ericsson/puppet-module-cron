@@ -23,6 +23,7 @@ This module has been tested to work on the following systems with Puppet v3 and 
  * SLES 10
  * SLES 11
  * Ubuntu 12
+ * Debian 7
 
 ===
 
