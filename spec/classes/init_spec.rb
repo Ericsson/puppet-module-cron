@@ -166,6 +166,27 @@ describe 'cron' do
           }
         end
 
+        context 'where crontab file attributes are specified' do
+          let :params do
+            {
+              :crontab_owner => 'other',
+              :crontab_group => 'other',
+              :crontab_mode => '0640',
+            }
+          end
+
+          it {
+            should contain_file('crontab').with({
+              'ensure'  => 'present',
+              'path'    => '/etc/crontab',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0640',
+              'require' => "Package[#{v[:package_name]}]",
+            })
+          }
+        end
+
         context 'where cron_allow is <present>' do
           let :params do
             {
@@ -227,6 +248,27 @@ describe 'cron' do
           }
         end
 
+        context 'where cron_allow file attributes are specified' do
+          let :params do
+            {
+              :cron_allow_owner => 'other',
+              :cron_allow_group => 'other',
+              :cron_allow_mode => '0640',
+            }
+          end
+
+          it {
+            should contain_file('cron_allow').with({
+              'ensure'  => 'absent',
+              'path'    => '/etc/cron.allow',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0640',
+              'require' => "Package[#{v[:package_name]}]",
+            })
+          }
+        end
+
         context 'where cron_deny_path is </somewhere/else/deny>' do
           let :params do
             {
@@ -241,6 +283,26 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
+              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+            })
+          }
+        end
+
+        context 'where cron_deny file attributes are specified' do
+          let :params do
+            {
+              :cron_deny_owner => 'other',
+              :cron_deny_group => 'other',
+              :cron_deny_mode => '0640',
+            }
+          end
+          it {
+            should contain_file('cron_deny').with({
+              'ensure'  => 'absent',
+              'path'    => '/etc/cron.deny',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0640',
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
             })
           }
