@@ -14,9 +14,9 @@ describe 'cron' do
         :package_name => 'cron',
         :service_name => 'cron',
       },
-    'Ubuntu' =>
+    'Debian' =>
       {
-        :osfamily     => 'Ubuntu',
+        :osfamily     => 'Debian',
         :package_name => 'cron',
         :service_name => 'cron',
       },
