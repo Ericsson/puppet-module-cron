@@ -3,28 +3,48 @@
 # This module manages cron
 #
 class cron (
-  $enable_cron      = true,
-  $package_ensure   = 'present',
-  $ensure_state     = 'running',
-  $crontab_path     = '/etc/crontab',
-  $crontab_owner    = 'root',
-  $crontab_group    = 'root',
-  $crontab_mode     = '0644',
-  $cron_allow       = 'absent',
-  $cron_deny        = 'absent',
-  $cron_allow_path  = '/etc/cron.allow',
-  $cron_allow_owner = 'root',
-  $cron_allow_group = 'root',
-  $cron_allow_mode  = '0644',
-  $cron_deny_path   = '/etc/cron.deny',
-  $cron_deny_owner = 'root',
-  $cron_deny_group = 'root',
-  $cron_deny_mode  = '0644',
-  $cron_files       = undef,
-  $cron_allow_users = undef,
-  $cron_deny_users  = undef,
-  $crontab_vars     = undef,
-  $crontab_tasks    = undef,
+  $enable_cron        = true,
+  $package_ensure     = 'present',
+  $ensure_state       = 'running',
+  $crontab_path       = '/etc/crontab',
+  $crontab_owner      = 'root',
+  $crontab_group      = 'root',
+  $crontab_mode       = '0644',
+  $cron_allow         = 'absent',
+  $cron_deny          = 'absent',
+  $cron_allow_path    = '/etc/cron.allow',
+  $cron_allow_owner   = 'root',
+  $cron_allow_group   = 'root',
+  $cron_allow_mode    = '0644',
+  $cron_deny_path     = '/etc/cron.deny',
+  $cron_deny_owner    = 'root',
+  $cron_deny_group    = 'root',
+  $cron_deny_mode     = '0644',
+  $cron_d_path        = '/etc/cron.d',
+  $cron_d_owner       = 'root',
+  $cron_d_group       = 'root',
+  $cron_d_mode        = '0755',
+  $cron_hourly_path   = '/etc/cron.hourly',
+  $cron_hourly_owner  = 'root',
+  $cron_hourly_group  = 'root',
+  $cron_hourly_mode   = '0755',
+  $cron_daily_path    = '/etc/cron.daily',
+  $cron_daily_owner   = 'root',
+  $cron_daily_group   = 'root',
+  $cron_daily_mode    = '0755',
+  $cron_weekly_path   = '/etc/cron.weekly',
+  $cron_weekly_owner  = 'root',
+  $cron_weekly_group  = 'root',
+  $cron_weekly_mode   = '0755',
+  $cron_monthly_path  = '/etc/cron.monthly',
+  $cron_monthly_owner = 'root',
+  $cron_monthly_group = 'root',
+  $cron_monthly_mode  = '0755',
+  $cron_files         = undef,
+  $cron_allow_users   = undef,
+  $cron_deny_users    = undef,
+  $crontab_vars       = undef,
+  $crontab_tasks      = undef,
 ) {
 
   # Check the client os to define the package name and service name
@@ -116,6 +136,51 @@ class cron (
     group   => $crontab_group,
     mode    => $crontab_mode,
     content => template('cron/crontab.erb'),
+    require => Package[$package_name],
+  }
+
+  file { 'cron_d':
+    ensure  => directory,
+    path    => $cron_d_path,
+    owner   => $cron_d_owner,
+    group   => $cron_d_group,
+    mode    => $cron_d_mode,
+    require => Package[$package_name],
+  }
+
+  file { 'cron_hourly':
+    ensure  => directory,
+    path    => $cron_hourly_path,
+    owner   => $cron_hourly_owner,
+    group   => $cron_hourly_group,
+    mode    => $cron_hourly_mode,
+    require => Package[$package_name],
+  }
+
+  file { 'cron_daily':
+    ensure  => directory,
+    path    => $cron_daily_path,
+    owner   => $cron_daily_owner,
+    group   => $cron_daily_group,
+    mode    => $cron_daily_mode,
+    require => Package[$package_name],
+  }
+
+  file { 'cron_weekly':
+    ensure  => directory,
+    path    => $cron_weekly_path,
+    owner   => $cron_weekly_owner,
+    group   => $cron_weekly_group,
+    mode    => $cron_weekly_mode,
+    require => Package[$package_name],
+  }
+
+  file { 'cron_monthly':
+    ensure  => directory,
+    path    => $cron_monthly_path,
+    owner   => $cron_monthly_owner,
+    group   => $cron_monthly_group,
+    mode    => $cron_monthly_mode,
     require => Package[$package_name],
   }
 

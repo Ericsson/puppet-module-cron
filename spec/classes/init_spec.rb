@@ -74,6 +74,61 @@ describe 'cron' do
         }
 
         it {
+          should contain_file('cron_d').with({
+            'ensure'  => 'directory',
+            'path'    => '/etc/cron.d',
+            'owner'   => 'root',
+            'group'   => 'root',
+            'mode'    => '0755',
+            'require' => "Package[#{v[:package_name]}]",
+          })
+        }
+
+        it {
+          should contain_file('cron_hourly').with({
+            'ensure'  => 'directory',
+            'path'    => '/etc/cron.hourly',
+            'owner'   => 'root',
+            'group'   => 'root',
+            'mode'    => '0755',
+            'require' => "Package[#{v[:package_name]}]",
+          })
+        }
+
+        it {
+          should contain_file('cron_daily').with({
+            'ensure'  => 'directory',
+            'path'    => '/etc/cron.daily',
+            'owner'   => 'root',
+            'group'   => 'root',
+            'mode'    => '0755',
+            'require' => "Package[#{v[:package_name]}]",
+          })
+        }
+
+        it {
+          should contain_file('cron_weekly').with({
+            'ensure'  => 'directory',
+            'path'    => '/etc/cron.weekly',
+            'owner'   => 'root',
+            'group'   => 'root',
+            'mode'    => '0755',
+            'require' => "Package[#{v[:package_name]}]",
+          })
+        }
+
+        it {
+          should contain_file('cron_monthly').with({
+            'ensure'  => 'directory',
+            'path'    => '/etc/cron.monthly',
+            'owner'   => 'root',
+            'group'   => 'root',
+            'mode'    => '0755',
+            'require' => "Package[#{v[:package_name]}]",
+          })
+        }
+
+        it {
           should contain_service('cron').with({
             'ensure'    => 'running',
             'enable'    => true,
@@ -304,6 +359,116 @@ describe 'cron' do
               'group'   => 'other',
               'mode'    => '0640',
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+            })
+          }
+        end
+
+        context 'where cron.d file attributes are specified' do
+          let :params do
+            {
+              :cron_d_path  => '/other/cron.d',
+              :cron_d_owner => 'other',
+              :cron_d_group => 'other',
+              :cron_d_mode  => '0750',
+            }
+          end
+
+          it {
+            should contain_file('cron_d').with({
+              'ensure'  => 'directory',
+              'path'    => '/other/cron.d',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0750',
+              'require' => "Package[#{v[:package_name]}]",
+            })
+          }
+        end
+
+        context 'where cron.hourly file attributes are specified' do
+          let :params do
+            {
+              :cron_hourly_path  => '/other/cron.hourly',
+              :cron_hourly_owner => 'other',
+              :cron_hourly_group => 'other',
+              :cron_hourly_mode  => '0750',
+            }
+          end
+
+          it {
+            should contain_file('cron_hourly').with({
+              'ensure'  => 'directory',
+              'path'    => '/other/cron.hourly',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0750',
+              'require' => "Package[#{v[:package_name]}]",
+            })
+          }
+        end
+
+        context 'where cron.daily file attributes are specified' do
+          let :params do
+            {
+              :cron_daily_path  => '/other/cron.daily',
+              :cron_daily_owner => 'other',
+              :cron_daily_group => 'other',
+              :cron_daily_mode  => '0750',
+            }
+          end
+
+          it {
+            should contain_file('cron_daily').with({
+              'ensure'  => 'directory',
+              'path'    => '/other/cron.daily',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0750',
+              'require' => "Package[#{v[:package_name]}]",
+            })
+          }
+        end
+
+        context 'where cron.weekly file attributes are specified' do
+          let :params do
+            {
+              :cron_weekly_path  => '/other/cron.weekly',
+              :cron_weekly_owner => 'other',
+              :cron_weekly_group => 'other',
+              :cron_weekly_mode  => '0750',
+            }
+          end
+
+          it {
+            should contain_file('cron_weekly').with({
+              'ensure'  => 'directory',
+              'path'    => '/other/cron.weekly',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0750',
+              'require' => "Package[#{v[:package_name]}]",
+            })
+          }
+        end
+
+        context 'where cron.monthly file attributes are specified' do
+          let :params do
+            {
+              :cron_monthly_path  => '/other/cron.monthly',
+              :cron_monthly_owner => 'other',
+              :cron_monthly_group => 'other',
+              :cron_monthly_mode  => '0750',
+            }
+          end
+
+          it {
+            should contain_file('cron_monthly').with({
+              'ensure'  => 'directory',
+              'path'    => '/other/cron.monthly',
+              'owner'   => 'other',
+              'group'   => 'other',
+              'mode'    => '0750',
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
         end
