@@ -21,7 +21,7 @@ class cron (
   # Check the client os to define the package name and service name
 
   case $::osfamily {
-    'Ubuntu', 'Suse': {
+    'Debian', 'Suse': {
       $package_name = 'cron'
       $service_name = 'cron'
     }
@@ -30,7 +30,7 @@ class cron (
       $service_name = 'crond'
     }
     default: {
-      fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
+      fail("cron supports osfamilies RedHat, Suse and Debian. Detected osfamily is <${::osfamily}>.")
     }
   }
 
