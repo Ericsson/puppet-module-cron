@@ -40,18 +40,17 @@ class cron (
   validate_re($cron_allow, '^(present)|(absent)$', "cron::cron_allow is ${cron_allow} and must be absent or present")
   validate_re($cron_deny, '^(present)|(absent)$', "cron::cron_deny is ${cron_deny} and must be absent or present")
 
-  case type($enable_cron) {
-    'string': {
-      validate_re($enable_cron, '^(true|false)$', "cron::enable_cron may be either 'true' or 'false' and is set to <${enable_cron}>")
-      $enable_cron_real = str2bool($enable_cron)
-    }
-    'boolean': {
-      $enable_cron_real = $enable_cron
-    }
-    default: {
-      fail('cron::enable_cron type must be true or false.')
-    }
+  if is_string($enable_cron) {
+    validate_re($enable_cron, '^(true|false)$', "cron::enable_cron may be either 'true' or 'false' and is set to <${enable_cron}>")
+    $enable_cron_real = str2bool($enable_cron)
   }
+  elsif is_bool($enable_cron) {
+    $enable_cron_real = $enable_cron
+  }
+  else {
+    fail('cron::enable_cron type must be true or false.')
+  }
+  
   if $cron_allow_users != undef {
     validate_array($cron_allow_users)
     $cron_allow_real='present'
