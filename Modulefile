@@ -7,4 +7,4 @@ summary 'Manage cron'
 description 'Manage cron'
 project_page 'https://github.com/Ericsson/puppet-module-cron'
 
-dependency 'puppetlabs/stdlib', '>= 3.2.0'
+dependency 'puppetlabs/stdlib', '>= 3.2.0 < 5.0.0'
