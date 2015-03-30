@@ -1,6 +1,8 @@
 require 'spec_helper'
 describe 'cron' do
 
+  file_with_no_entries = File.read(fixtures('file_with_no_entries'))
+
   platforms = {
     'RedHat' =>
       {
@@ -181,7 +183,8 @@ describe 'cron' do
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
             })
           }
-          it { should contain_file('cron_allow').with_content(/^# File managed by puppet$/) }
+
+          it { should contain_file('cron_allow').with_content(file_with_no_entries) }
         end
 
         context 'where cron_deny is <present>' do
@@ -201,7 +204,8 @@ describe 'cron' do
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
             })
           }
-          it { should contain_file('cron_deny').with_content(/^# File managed by puppet\n# Do not edit manually$/) }
+
+          it { should contain_file('cron_deny').with_content(file_with_no_entries) }
         end
 
         context 'where cron_allow_path is </somwhere/else/allow>' do
@@ -221,7 +225,6 @@ describe 'cron' do
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
             })
           }
-          it { should contain_file('cron_allow').with_content(/^# File managed by puppet$/) }
         end
 
         context 'where cron_deny_path is </somewhere/else/deny>' do
@@ -241,7 +244,6 @@ describe 'cron' do
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
             })
           }
-          it { should contain_file('cron_deny').with_content(/^# File managed by puppet\n# Do not edit manually$/) }
         end
 
 # TODO: test for cron_files
@@ -263,7 +265,6 @@ describe 'cron' do
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
             })
           }
-          it { should contain_file('cron_allow').with_content(/^# File managed by puppet\n# Do not edit manually$/) }
           it { should contain_file('cron_allow').with_content(/^Tintin\nMilou$/) }
         end
 
@@ -284,7 +285,6 @@ describe 'cron' do
               'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
             })
           }
-          it { should contain_file('cron_deny').with_content(/^# File managed by puppet\n# Do not edit manually$/) }
           it { should contain_file('cron_deny').with_content(/^nobody\nanyone$/) }
         end
 
@@ -308,7 +308,6 @@ describe 'cron' do
               'require' => "Package[#{v[:package_name]}]",
             })
           }
-          it { should contain_file('crontab').with_content(/^### Crontab File managed by Puppet\n### DOT NOT change it manually$/) }
           it { should contain_file('crontab').with_content(/^MAILTO=operator\nSHELL=\/bin\/tcsh$/) }
         end
 
@@ -331,7 +330,6 @@ describe 'cron' do
               'require' => "Package[#{v[:package_name]}]",
             })
           }
-          it { should contain_file('crontab').with_content(/^### Crontab File managed by Puppet\n### DOT NOT change it manually$/) }
           it { should contain_file('crontab').with_content(/^# spec_test\n42 \* \* \* \* nobody echo task1$/) }
 
        end
