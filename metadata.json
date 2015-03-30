@@ -1,0 +1,14 @@
+{
+  "name": "ericsson-cron",
+  "version": "1.0.0",
+  "author": "Ericsson",
+  "summary": "Manage cron",
+  "license": "Apache-2.0",
+  "source": "git://github.com/Ericsson/puppet-module-cron.git",
+  "project_page": "https://github.com/Ericsson/puppet-module-cron",
+  "issues_url": "https://github.com/Ericsson/puppet-module-cron/issues",
+  "description": "Manage cron",
+  "dependencies": [
+    {"name":"puppetlabs/stdlib","version_requirement":">= 3.2.0 < 5.0.0"}
+  ]
+}
