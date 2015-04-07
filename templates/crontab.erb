@@ -10,7 +10,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
 HOME=/
 <% else %>
-<% crontab_vars.sort.each do |key,val| -%>
+<% @crontab_vars.sort.each do |key,val| -%>
 <%= key %>=<%= val %>
 <% end -%>
 <% end -%>
@@ -26,15 +26,15 @@ HOME=/
 # *  *  *  *  * username command-to-be-executed
 
 <% if @crontab_tasks != nil  -%>
-<% crontab_tasks.sort.each do |key,val| -%>
+<% @crontab_tasks.sort.each do |key,val| -%>
 # <%= key %>
 <% val.each do |crontask_value|  -%>
 <%= crontask_value %>
 <% end -%>
 <% end -%>
 <% end -%>
-<% if osfamily == 'RedHat' -%>
-<% if operatingsystemmajrelease == '5' -%>
+<% if @osfamily == 'RedHat' -%>
+<% if @operatingsystemmajrelease == '5' -%>
 # run-parts
 01 * * * * root run-parts /etc/cron.hourly
 02 4 * * * root run-parts /etc/cron.daily
