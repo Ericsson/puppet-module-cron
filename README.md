@@ -1,6 +1,6 @@
 # puppet-module-cron
 
-Manage the cron configuration files :
+Manage the cron configuration files.
 
 - /etc/crontab
 - /etc/cron.allow
@@ -16,7 +16,7 @@ Manage the cron configuration files :
 
 # Compatibility
 
-This module has been tested to work on the following systems with Puppet v3 and Ruby versions 1.8.7, 1.9.3 and 2.0.0.
+This module has been tested to work on the following systems with Puppet v3 with Ruby versions 1.8.7, 1.9.3, 2.0.0 and 2.1.0.
 
  * EL 5
  * EL 6
