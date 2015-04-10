@@ -367,9 +367,9 @@ describe 'cron' do
           let :params do
             {
               :cron_d_path  => '/other/cron.d',
-              :cron_d_owner => 'other',
-              :cron_d_group => 'other',
-              :cron_d_mode  => '0750',
+              :cron_dir_owner => 'other',
+              :cron_dir_group => 'other',
+              :cron_dir_mode  => 'o-rwx',
             }
           end
 
@@ -379,7 +379,7 @@ describe 'cron' do
               'path'    => '/other/cron.d',
               'owner'   => 'other',
               'group'   => 'other',
-              'mode'    => '0750',
+              'mode'    => 'o-rwx',
               'require' => "Package[#{v[:package_name]}]",
             })
           }
@@ -389,9 +389,9 @@ describe 'cron' do
           let :params do
             {
               :cron_hourly_path  => '/other/cron.hourly',
-              :cron_hourly_owner => 'other',
-              :cron_hourly_group => 'other',
-              :cron_hourly_mode  => '0750',
+              :cron_dir_owner => 'other',
+              :cron_dir_group => 'other',
+              :cron_dir_mode  => '0750',
             }
           end
 
@@ -411,9 +411,9 @@ describe 'cron' do
           let :params do
             {
               :cron_daily_path  => '/other/cron.daily',
-              :cron_daily_owner => 'other',
-              :cron_daily_group => 'other',
-              :cron_daily_mode  => '0750',
+              :cron_dir_owner => 'other',
+              :cron_dir_group => 'other',
+              :cron_dir_mode  => '0750',
             }
           end
 
@@ -433,9 +433,9 @@ describe 'cron' do
           let :params do
             {
               :cron_weekly_path  => '/other/cron.weekly',
-              :cron_weekly_owner => 'other',
-              :cron_weekly_group => 'other',
-              :cron_weekly_mode  => '0750',
+              :cron_dir_owner => 'other',
+              :cron_dir_group => 'other',
+              :cron_dir_mode  => '0750',
             }
           end
 
@@ -455,9 +455,9 @@ describe 'cron' do
           let :params do
             {
               :cron_monthly_path  => '/other/cron.monthly',
-              :cron_monthly_owner => 'other',
-              :cron_monthly_group => 'other',
-              :cron_monthly_mode  => '0750',
+              :cron_dir_owner => 'other',
+              :cron_dir_group => 'other',
+              :cron_dir_mode  => '0750',
             }
           end
 

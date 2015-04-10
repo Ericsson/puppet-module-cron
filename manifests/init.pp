@@ -21,25 +21,13 @@ class cron (
   $cron_deny_group    = 'root',
   $cron_deny_mode     = '0644',
   $cron_d_path        = '/etc/cron.d',
-  $cron_d_owner       = 'root',
-  $cron_d_group       = 'root',
-  $cron_d_mode        = '0755',
   $cron_hourly_path   = '/etc/cron.hourly',
-  $cron_hourly_owner  = 'root',
-  $cron_hourly_group  = 'root',
-  $cron_hourly_mode   = '0755',
   $cron_daily_path    = '/etc/cron.daily',
-  $cron_daily_owner   = 'root',
-  $cron_daily_group   = 'root',
-  $cron_daily_mode    = '0755',
   $cron_weekly_path   = '/etc/cron.weekly',
-  $cron_weekly_owner  = 'root',
-  $cron_weekly_group  = 'root',
-  $cron_weekly_mode   = '0755',
   $cron_monthly_path  = '/etc/cron.monthly',
-  $cron_monthly_owner = 'root',
-  $cron_monthly_group = 'root',
-  $cron_monthly_mode  = '0755',
+  $cron_dir_owner     = 'root',
+  $cron_dir_group     = 'root',
+  $cron_dir_mode      = '0755',
   $cron_files         = undef,
   $cron_allow_users   = undef,
   $cron_deny_users    = undef,
@@ -102,6 +90,16 @@ class cron (
   if $crontab_vars != undef {
     validate_hash($crontab_vars)
   }
+
+  validate_absolute_path($cron_allow_path)
+  validate_absolute_path($cron_deny_path)
+  validate_absolute_path($crontab_path)
+  validate_absolute_path($cron_d_path)
+  validate_absolute_path($cron_hourly_path)
+  validate_absolute_path($cron_daily_path)
+  validate_absolute_path($cron_weekly_path)
+  validate_absolute_path($cron_monthly_path)
+
   # End of validation
 
   file { 'cron_allow':
@@ -142,45 +140,45 @@ class cron (
   file { 'cron_d':
     ensure  => directory,
     path    => $cron_d_path,
-    owner   => $cron_d_owner,
-    group   => $cron_d_group,
-    mode    => $cron_d_mode,
+    owner   => $cron_dir_owner,
+    group   => $cron_dir_group,
+    mode    => $cron_dir_mode,
     require => Package[$package_name],
   }
 
   file { 'cron_hourly':
     ensure  => directory,
     path    => $cron_hourly_path,
-    owner   => $cron_hourly_owner,
-    group   => $cron_hourly_group,
-    mode    => $cron_hourly_mode,
+    owner   => $cron_dir_owner,
+    group   => $cron_dir_group,
+    mode    => $cron_dir_mode,
     require => Package[$package_name],
   }
 
   file { 'cron_daily':
     ensure  => directory,
     path    => $cron_daily_path,
-    owner   => $cron_daily_owner,
-    group   => $cron_daily_group,
-    mode    => $cron_daily_mode,
+    owner   => $cron_dir_owner,
+    group   => $cron_dir_group,
+    mode    => $cron_dir_mode,
     require => Package[$package_name],
   }
 
   file { 'cron_weekly':
     ensure  => directory,
     path    => $cron_weekly_path,
-    owner   => $cron_weekly_owner,
-    group   => $cron_weekly_group,
-    mode    => $cron_weekly_mode,
+    owner   => $cron_dir_owner,
+    group   => $cron_dir_group,
+    mode    => $cron_dir_mode,
     require => Package[$package_name],
   }
 
   file { 'cron_monthly':
     ensure  => directory,
     path    => $cron_monthly_path,
-    owner   => $cron_monthly_owner,
-    group   => $cron_monthly_group,
-    mode    => $cron_monthly_mode,
+    owner   => $cron_dir_owner,
+    group   => $cron_dir_group,
+    mode    => $cron_dir_mode,
     require => Package[$package_name],
   }
 
