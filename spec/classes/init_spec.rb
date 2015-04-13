@@ -369,7 +369,7 @@ describe 'cron' do
               :cron_d_path  => '/other/cron.d',
               :cron_dir_owner => 'other',
               :cron_dir_group => 'other',
-              :cron_dir_mode  => 'o-rwx',
+              :cron_dir_mode  => '0750',
             }
           end
 
@@ -379,7 +379,7 @@ describe 'cron' do
               'path'    => '/other/cron.d',
               'owner'   => 'other',
               'group'   => 'other',
-              'mode'    => 'o-rwx',
+              'mode'    => '0750',
               'require' => "Package[#{v[:package_name]}]",
             })
           }
@@ -559,7 +559,151 @@ describe 'cron' do
           }
           it { should contain_file('crontab').with_content(/^# spec_test\n42 \* \* \* \* nobody echo task1$/) }
 
-       end
+        end
+
+        context "with crontab_owner specified as a non-string" do
+          let(:params) {{
+            :crontab_owner => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::crontab_owner must be a string/)
+          end
+        end
+
+        context "with cron_dir_owner specified as a non-string" do
+          let(:params) {{
+            :cron_dir_owner => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_dir_owner must be a string/)
+          end
+        end
+
+        context "with cron_allow_owner specified as a non-string" do
+          let(:params) {{
+            :cron_allow_owner => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_allow_owner must be a string/)
+          end
+        end
+
+        context "with cron_deny_owner specified as a non-string" do
+          let(:params) {{
+            :cron_deny_owner => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_deny_owner must be a string/)
+          end
+        end
+
+        context "with crontab_group specified as a non-string" do
+          let(:params) {{
+            :crontab_group => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::crontab_group must be a string/)
+          end
+        end
+
+        context "with cron_dir_group specified as a non-string" do
+          let(:params) {{
+            :cron_dir_group => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_dir_group must be a string/)
+          end
+        end
+
+        context "with cron_allow_group specified as a non-string" do
+          let(:params) {{
+            :cron_allow_group => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_allow_group must be a string/)
+          end
+        end
+
+        context "with cron_deny_group specified as a non-string" do
+          let(:params) {{
+            :cron_deny_group => ['not','a string']
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_deny_group must be a string/)
+          end
+        end
+
+        context "with crontab_mode specified as invalid value" do
+          let(:params) {{
+            :crontab_mode => 'str'
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::crontab_mode must use the standard four-digit octal notation/)
+          end
+        end
+
+        context "with cron_dir_mode specified as invalid value" do
+          let(:params) {{
+            :cron_dir_mode => '770'
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_dir_mode must use the standard four-digit octal notation/)
+          end
+        end
+
+        context "with cron_allow_mode specified as invalid value" do
+          let(:params) {{
+            :cron_allow_mode => 'str'
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_allow_mode must use the standard four-digit octal notation/)
+          end
+        end
+
+        context "with cron_deny_mode specified as invalid value" do
+          let(:params) {{
+            :cron_deny_mode => 'str'
+          }}
+
+          it 'should fail' do
+            expect {
+              should contain_class('cron')
+            }.to raise_error(Puppet::Error,/cron::cron_deny_mode must use the standard four-digit octal notation/)
+          end
+        end
 
       end
     end
