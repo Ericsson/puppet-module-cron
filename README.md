@@ -26,6 +26,10 @@ This module has been tested to work on the following systems with Puppet v3
  * SLES 11
  * Ubuntu 12
 
+Note that SLES patches ISC's cron such that if cron.allow and cron.deny are
+both missing, then root will not be able to access the crontabs. This will
+cause errors. Please see the Hiera example below.
+
 ===
 
 # Parameters
@@ -33,66 +37,75 @@ A value of `'undef'` will use the defaults specified by the module.
 
 
 enable_cron
----------------
-Boolean to enable the service cron. Valid values are true, false
+-----------
+Boolean to enable the cron service.
 
 - *Default*: true
 
 package_ensure
-----------------
-What state the package should be in. Valid values are 'present', 'absent', 'purged', 'held' and 'latest'.
+--------------
+String for the ensure parameter for the cron package. Valid values are 'present', 'absent', 'purged', 'held' and 'latest'.
 
 - *Default*: 'present'
 
 ensure_state
----------------
-What state the cron service should be in. Valid values are 'running' and 'stopped'.
+------------
+String for the ensure parameter for the cron service. Valid values are 'running' and 'stopped'.
 
 - *Default*: 'running'
 
 crontab_path
----------------
-crontab's path.
+------------
+String for path to system wide crontab.
 
 - *Default*: '/etc/crontab'
 
 cron_allow
---------------
-If the file cron.allow exists, only users listed in it are allowed to use cron, and the cron.deny file is ignored. Valid values are 'present' and 'absent'.
+----------
+If the file cron.allow exists, only users listed in it are allowed to use cron,
+and the cron.deny file is ignored. Valid values are 'present' and 'absent'.
 
 - *Default*: 'absent'
 
 cron_deny
-------------
-If cron.allow does not exist, users listed in cron.deny are not allowed to use cron. Valid values are 'present' and 'absent'.
+---------
+If cron.allow does not exist, users listed in cron.deny are not allowed to use
+cron. Valid values are 'present' and 'absent'.
 
 - *Default*: 'absent'
 
 cron_allow_path
 ---------------
-Path of cron.allow.
+Path to cron.allow.
 
 - *Default*: '/etc/cron.allow'
 
 cron_deny_path
 --------------
-Path of cron.deny.
+Path to cron.deny.
 
 - *Default*: '/etc/cron.deny'
 
 crontab_vars
--------------
-Defines the crontab variables SHELL, PATH, MAILTO, HOME. if this variable is undef the module will use the values defined in crontab template which are SHELL=/bin/bash, PATH=/sbin:/bin:/usr/sbin:/usr/bin, MAILTO=root, HOME=/, valid value is hash.
+------------
+Hash that defines the crontab variables SHELL, PATH, MAILTO, HOME. if this variable is undef the module will use the values defined in crontab template which are SHELL=/bin/bash, PATH=/sbin:/bin:/usr/sbin:/usr/bin, MAILTO=root, HOME=/
 
 - *Default*: undef
 
 crontab_tasks
-----------------
-Define crontab tasks. valid value is hash.
+-------------
+Hash for crontab tasks.
 
 - *Default*: undef
 
 ## Sample usage:
+
+**Work on Suse**
+<pre>
+cron::cron_allow: 'present'
+cron::cron_allow_users:
+  - root
+</pre>
 
 **Define crontab variables**
 <pre>
@@ -119,7 +132,7 @@ cron::cron_files:
 
 **Manage /etc/cron.allow**
 <pre>
-cron::cron_allow: 'true'
+cron::cron_allow: 'present'
 cron::cron_allow_users:
      - user1
 
