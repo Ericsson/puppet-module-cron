@@ -7,7 +7,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
 HOME=/
 <% else %>
-<% crontab_vars.sort.each do |key,val| -%>
+<% @crontab_vars.sort.each do |key,val| -%>
 <%= key %>=<%= val %>
 <% end -%>
 <% end -%>
@@ -23,7 +23,7 @@ HOME=/
 # *  *  *  *  * user-name command to be executed
 
 <% if @crontab_tasks != nil  -%>
-<% crontab_tasks.sort.each do |key,val| -%>
+<% @crontab_tasks.sort.each do |key,val| -%>
 # <%= key %>
 <% val.each do |crontask_value|  -%>
 <%= crontask_value %>
