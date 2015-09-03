@@ -8,7 +8,7 @@ class cron (
   $ensure_state     = 'running',
   $crontab_path     = '/etc/crontab',
   $cron_allow       = 'absent',
-  $cron_deny        = 'absent',
+  $cron_deny        = 'present',
   $cron_allow_path  = '/etc/cron.allow',
   $cron_deny_path   = '/etc/cron.deny',
   $cron_files       = undef,
