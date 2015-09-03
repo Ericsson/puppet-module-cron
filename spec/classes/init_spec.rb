@@ -286,9 +286,10 @@ describe 'cron' do
 
 # TODO: test for cron_files
 
-        context 'where cron_allow_users is <[ \'Tintin\', \'Milou\' ]>' do
+        context 'where cron_allow is <present> and cron_allow_users is <[ \'Tintin\', \'Milou\' ]>' do
           let :params do
             {
+              :cron_allow       => 'present',
               :cron_allow_users => [ 'Tintin', 'Milou', ],
             }
           end
