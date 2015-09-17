@@ -8,7 +8,7 @@ class cron (
   $ensure_state     = 'running',
   $crontab_path     = '/etc/crontab',
   $cron_allow       = 'absent',
-  $cron_deny        = 'absent',
+  $cron_deny        = 'present',
   $cron_allow_path  = '/etc/cron.allow',
   $cron_deny_path   = '/etc/cron.deny',
   $cron_files       = undef,
@@ -54,15 +54,9 @@ class cron (
   }
   if $cron_allow_users != undef {
     validate_array($cron_allow_users)
-    $cron_allow_real='present'
-  } else {
-    $cron_allow_real=$cron_allow
   }
   if $cron_deny_users != undef {
     validate_array($cron_deny_users)
-    $cron_deny_real='present'
-  } else {
-    $cron_deny_real=$cron_deny
   }
   if $cron_files != undef {
     create_resources(cron::fragment,$cron_files)
@@ -76,7 +70,7 @@ class cron (
   # End of validation
 
   file { 'cron_allow':
-    ensure  => $cron_allow_real,
+    ensure  => $cron_allow,
     path    => $cron_allow_path,
     owner   => root,
     group   => root,
@@ -86,7 +80,7 @@ class cron (
   }
 
   file { 'cron_deny':
-    ensure  => $cron_deny_real,
+    ensure  => $cron_deny,
     path    => $cron_deny_path,
     owner   => root,
     group   => root,

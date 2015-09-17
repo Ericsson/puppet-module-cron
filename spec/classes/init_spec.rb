@@ -46,7 +46,7 @@ describe 'cron' do
 
         it {
           should contain_file('cron_deny').with({
-            'ensure'  => 'absent',
+            'ensure'  => 'present',
             'path'    => '/etc/cron.deny',
             'owner'   => 'root',
             'group'   => 'root',
@@ -187,6 +187,25 @@ describe 'cron' do
           it { should contain_file('cron_allow').with_content(file_with_no_entries) }
         end
 
+        context 'where cron_allow is <absent>' do
+          let :params do
+            {
+              :cron_allow => 'absent',
+            }
+          end
+
+          it {
+            should contain_file('cron_allow').with({
+              'ensure'  => 'absent',
+              'path'    => '/etc/cron.allow',
+              'owner'   => 'root',
+              'group'   => 'root',
+              'mode'    => '0644',
+              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+            })
+          }
+        end
+
         context 'where cron_deny is <present>' do
           let :params do
             {
@@ -206,6 +225,25 @@ describe 'cron' do
           }
 
           it { should contain_file('cron_deny').with_content(file_with_no_entries) }
+        end
+
+        context 'where cron_deny is <absent>' do
+          let :params do
+            {
+              :cron_deny => 'absent',
+            }
+          end
+
+          it {
+            should contain_file('cron_deny').with({
+              'ensure'  => 'absent',
+              'path'    => '/etc/cron.deny',
+              'owner'   => 'root',
+              'group'   => 'root',
+              'mode'    => '0644',
+              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+            })
+          }
         end
 
         context 'where cron_allow_path is </somwhere/else/allow>' do
@@ -236,7 +274,7 @@ describe 'cron' do
 
           it {
             should contain_file('cron_deny').with({
-              'ensure'  => 'absent',
+              'ensure'  => 'present',
               'path'    => '/somewhere/else/deny',
               'owner'   => 'root',
               'group'   => 'root',
@@ -248,9 +286,10 @@ describe 'cron' do
 
 # TODO: test for cron_files
 
-        context 'where cron_allow_users is <[ \'Tintin\', \'Milou\' ]>' do
+        context 'where cron_allow is <present> and cron_allow_users is <[ \'Tintin\', \'Milou\' ]>' do
           let :params do
             {
+              :cron_allow       => 'present',
               :cron_allow_users => [ 'Tintin', 'Milou', ],
             }
           end

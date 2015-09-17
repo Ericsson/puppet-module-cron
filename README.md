@@ -72,7 +72,7 @@ cron_deny
 If cron.allow does not exist, users listed in cron.deny are not allowed to use
 cron. Valid values are 'present' and 'absent'.
 
-- *Default*: 'absent'
+- *Default*: 'present'
 
 cron_allow_path
 ---------------
