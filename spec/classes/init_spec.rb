@@ -57,7 +57,7 @@ describe 'cron' do
 
         it {
           should contain_package("#{v[:package_name]}").with({
-            'ensure' => 'present',
+            'ensure' => 'installed',
             'name'   => v[:package_name],
           })
         }
@@ -114,6 +114,24 @@ describe 'cron' do
           }
         end
 
+        context 'where service_name is set' do
+          let :params do
+            {
+              :service_name => 'cron2',
+            }
+          end
+
+          it {
+            should contain_service('cron').with({
+              'ensure'    => 'running',
+              'enable'    => true,
+              'name'      => 'cron2',
+              'require'   => 'File[crontab]',
+              'subscribe' => 'File[crontab]',
+            })
+          }
+        end
+
         context 'where package_ensure is <absent>' do
           let :params do
             {
@@ -125,6 +143,20 @@ describe 'cron' do
             should contain_package("#{v[:package_name]}").with({
               'ensure' => 'absent',
               'name'   => v[:package_name],
+            })
+          }
+        end
+
+        context 'where package_name is set' do
+          let :params do
+            {
+              :package_name => 'cron2',
+            }
+          end
+
+          it {
+            should contain_package('cron2').with({
+              'ensure' => 'installed',
             })
           }
         end
