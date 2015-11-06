@@ -21,9 +21,18 @@ class cron (
   # Check the client os to define the package name and service name
 
   case $::osfamily {
-    'Debian', 'Suse': {
+    'Debian': {
       $package_name = 'cron'
       $service_name = 'cron'
+    }
+    'Suse': {
+      if $::operatingsystemrelease =~ /^12\./ {
+        $package_name = 'cronie'
+        $service_name = 'cron'
+      } else {
+        $package_name = 'cron'
+        $service_name = 'cron'
+      }
     }
     'RedHat': {
       $package_name = 'crontabs'
