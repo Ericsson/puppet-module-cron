@@ -748,4 +748,46 @@ describe 'cron' do
     end
   end
 
+  describe 'variable type and content validations' do
+    # set needed custom facts and variables
+    let(:facts) { {
+      :osfamily => 'RedHat',
+    } }
+    let(:validation_params) { {
+#      :param => 'value',
+    } }
+
+    validations = {
+      'absolute_path' => {
+        :name    => ['cron_allow_path','cron_deny_path','crontab_path','cron_d_path','cron_hourly_path','cron_daily_path','cron_weekly_path','cron_monthly_path'],
+        :valid   => ['/absolute/filepath','/absolute/directory/'],
+        :invalid => ['./invalid',3,2.42,['array'],a={'ha'=>'sh'}],
+        :message => 'is not an absolute path',
+      },
+    }
+
+    validations.sort.each do |type,var|
+      var[:name].each do |var_name|
+
+        var[:valid].each do |valid|
+          context "with #{var_name} (#{type}) set to valid #{valid} (as #{valid.class})" do
+            let(:params) { validation_params.merge({:"#{var_name}" => valid, }) }
+            it { should compile }
+          end
+        end
+
+        var[:invalid].each do |invalid|
+          context "with #{var_name} (#{type}) set to invalid #{invalid} (as #{invalid.class})" do
+            let(:params) { validation_params.merge({:"#{var_name}" => invalid, }) }
+            it 'should fail' do
+              expect {
+                should contain_class(subject)
+              }.to raise_error(Puppet::Error,/#{var[:message]}/)
+            end
+          end
+        end
+
+      end # var[:name].each
+    end # validations.sort.each
+  end # describe 'variable type and content validations'
 end
