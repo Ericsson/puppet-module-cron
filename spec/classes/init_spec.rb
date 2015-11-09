@@ -7,18 +7,21 @@ describe 'cron' do
     'RedHat' =>
       {
         :osfamily     => 'RedHat',
+        :osrelease    => '6.7',
         :package_name => 'crontabs',
         :service_name => 'crond',
       },
     'Suse' =>
       {
         :osfamily     => 'Suse',
+        :osrelease    => '11.3',
         :package_name => 'cron',
         :service_name => 'cron',
       },
     'Debian' =>
       {
         :osfamily     => 'Debian',
+        :osrelease    => '7.9',
         :package_name => 'cron',
         :service_name => 'cron',
       },
@@ -29,7 +32,8 @@ describe 'cron' do
       context "where osfamily is <#{v[:osfamily]}>" do
         let :facts do
           {
-            :osfamily          => v[:osfamily],
+            :osfamily               => v[:osfamily],
+            :operatingsystemrelease => v[:osrelease],
           }
         end
 
@@ -152,7 +156,8 @@ describe 'cron' do
       context "where osfamily is <#{v[:osfamily]}>" do
         let :facts do
           {
-            :osfamily          => v[:osfamily],
+            :osfamily               => v[:osfamily],
+            :operatingsystemrelease => v[:osrelease],
           }
         end
 
