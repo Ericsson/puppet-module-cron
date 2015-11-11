@@ -60,6 +60,24 @@ String for path to system wide crontab.
 
 - *Default*: '/etc/crontab'
 
+crontab_owner (string)
+-------------------------
+Name of the owner of the crontab file.
+
+- *Default*: 'root'
+
+crontab_group (string)
+-------------------------
+Name of the group of the crontab file.
+
+- *Default*: 'root'
+
+crontab_mode (string)
+------------------------
+Filemode of the  crontab file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+
+- *Default*: '0644'
+
 cron_allow
 ----------
 If the file cron.allow exists, only users listed in it are allowed to use cron,
@@ -80,11 +98,96 @@ Path to cron.allow.
 
 - *Default*: '/etc/cron.allow'
 
+cron_allow_owner (string)
+-------------------------
+Name of the owner of the cron_allow file.
+
+- *Default*: 'root'
+
+cron_allow_group (string)
+-------------------------
+Name of the group of the cron_allow file.
+
+- *Default*: 'root'
+
+cron_allow_mode (string)
+------------------------
+Filemode of the  cron_allow file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+
+- *Default*: '0644'
+
+cron_d_path (string)
+--------------------
+Path to cron.d directory. Must be an absolute path.
+
+- *Default*: '/etc/cron.d'
+
+cron_hourly_path (string)
+-------------------------
+Path to cron.d directory. Must be an absolute path.
+
+- *Default*: '/etc/cron.hourly'
+
+cron_daily_path (string)
+------------------------
+Path to cron.daily directory. Must be an absolute path.
+
+- *Default*: '/etc/cron.daily'
+
+cron_weekly_path (string)
+-------------------------
+Path to cron.weekly directory. Must be an absolute path.
+
+- *Default*: '/etc/cron.weekly'
+
+cron_monthly_path (string)
+--------------------------
+Path to cron.monthly directory. Must be an absolute path.
+
+- *Default*: '/etc/cron.monthly'
+
+cron_dir_owner (string)
+-----------------------
+Name of the owner of the cron directories cron.d, cron.hourly, cron.daily, cron.weekly and cron.monthly.
+
+- *Default*: 'root'
+
+cron_dir_group (string)
+-----------------------
+Name of the group of the cron.d directories cron.d, cron.hourly, cron.daily, cron.weekly and cron.monthly.
+
+- *Default*: 'root'
+
+cron_dir_mode (string)
+--------..------------
+Filemode of the cron.d directories cron.d, cron.hourly, cron.daily, cron.weekly and cron.monthly. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+
+- *Default*: '0755'
+
 cron_deny_path
 --------------
 Path to cron.deny.
 
 - *Default*: '/etc/cron.deny'
+
+cron_deny_owner (string)
+------------------------
+Name of the owner of the cron_deny file.
+
+- *Default*: 'root'
+
+
+cron_deny_group (string)
+------------------------
+Name of the group of the cron_deny file.
+
+- *Default*: 'root'
+
+cron_deny_mode (string)
+-----------------------
+Filemode of the cron_deny file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+
+- *Default*: '0644'
 
 crontab_vars
 ------------
