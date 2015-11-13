@@ -4,7 +4,8 @@
 #
 class cron (
   $enable_cron        = true,
-  $package_ensure     = 'present',
+  $package_ensure     = 'installed',
+  $package_name       = 'USE_DEFAULTS',
   $ensure_state       = 'running',
   $crontab_path       = '/etc/crontab',
   $crontab_owner      = 'root',
@@ -33,36 +34,47 @@ class cron (
   $cron_deny_users    = undef,
   $crontab_vars       = undef,
   $crontab_tasks      = undef,
+  $service_name       = 'USE_DEFAULTS',
 ) {
-
-  # Check the client os to define the package name and service name
 
   case $::osfamily {
     'Debian': {
-      $package_name = 'cron'
-      $service_name = 'cron'
+      $default_package_name = 'cron'
+      $default_service_name = 'cron'
     }
     'Suse': {
       if $::operatingsystemrelease =~ /^12\./ {
-        $package_name = 'cronie'
-        $service_name = 'cron'
+        $default_package_name = 'cronie'
+        $default_service_name = 'cron'
       } else {
-        $package_name = 'cron'
-        $service_name = 'cron'
+        $default_package_name = 'cron'
+        $default_service_name = 'cron'
       }
     }
     'RedHat': {
-      $package_name = 'crontabs'
-      $service_name = 'crond'
+      $default_package_name = 'crontabs'
+      $default_service_name = 'crond'
     }
     default: {
       fail("cron supports osfamilies RedHat, Suse and Debian. Detected osfamily is <${::osfamily}>.")
     }
   }
 
+  if $package_name == 'USE_DEFAULTS' {
+    $package_name_real = $default_package_name
+  } else {
+    $package_name_real = $package_name
+  }
+
+  if $service_name == 'USE_DEFAULTS' {
+    $service_name_real = $default_service_name
+  } else {
+    $service_name_real = $service_name
+  }
+
   # Validation
   validate_re($ensure_state, '^(running)|(stopped)$', "cron::ensure_state is ${ensure_state} and must be running or stopped")
-  validate_re($package_ensure, '^(present)|(absent)$', "cron::package_ensure is ${package_ensure} and must be absent or present")
+  validate_re($package_ensure, '^(present)|(installed)|(absent)$', "cron::package_ensure is ${package_ensure} and must be absent, present or installed")
   validate_re($cron_allow, '^(present)|(absent)$', "cron::cron_allow is ${cron_allow} and must be absent or present")
   validate_re($cron_deny, '^(present)|(absent)$', "cron::cron_deny is ${cron_deny} and must be absent or present")
 
@@ -126,7 +138,7 @@ class cron (
     group   => $cron_allow_group,
     mode    => $cron_allow_mode,
     content => template('cron/cron_allow.erb'),
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
   file { 'cron_deny':
@@ -136,12 +148,11 @@ class cron (
     group   => $cron_deny_group,
     mode    => $cron_deny_mode,
     content => template('cron/cron_deny.erb'),
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
-  package { $package_name:
+  package { $package_name_real:
     ensure => $package_ensure,
-    name   => $package_name,
   }
 
   file { 'crontab':
@@ -151,7 +162,7 @@ class cron (
     group   => $crontab_group,
     mode    => $crontab_mode,
     content => template('cron/crontab.erb'),
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
   file { 'cron_d':
@@ -160,7 +171,7 @@ class cron (
     owner   => $cron_dir_owner,
     group   => $cron_dir_group,
     mode    => $cron_dir_mode,
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
   file { 'cron_hourly':
@@ -169,7 +180,7 @@ class cron (
     owner   => $cron_dir_owner,
     group   => $cron_dir_group,
     mode    => $cron_dir_mode,
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
   file { 'cron_daily':
@@ -178,7 +189,7 @@ class cron (
     owner   => $cron_dir_owner,
     group   => $cron_dir_group,
     mode    => $cron_dir_mode,
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
   file { 'cron_weekly':
@@ -187,7 +198,7 @@ class cron (
     owner   => $cron_dir_owner,
     group   => $cron_dir_group,
     mode    => $cron_dir_mode,
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
   file { 'cron_monthly':
@@ -196,13 +207,13 @@ class cron (
     owner   => $cron_dir_owner,
     group   => $cron_dir_group,
     mode    => $cron_dir_mode,
-    require => Package[$package_name],
+    require => Package[$package_name_real],
   }
 
   service { 'cron':
     ensure    => $ensure_state,
     enable    => $enable_cron_real,
-    name      => $service_name,
+    name      => $service_name_real,
     require   => File['crontab'],
     subscribe => File['crontab'],
   }

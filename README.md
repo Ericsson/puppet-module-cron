@@ -47,9 +47,15 @@ Boolean to enable the cron service.
 
 package_ensure
 --------------
-String for the ensure parameter for the cron package. Valid values are 'present', 'absent', 'purged', 'held' and 'latest'.
+String for the ensure parameter for the cron package. Valid values are 'installed', 'present' and 'absent'.
 
-- *Default*: 'present'
+- *Default*: 'installed'
+
+package_name
+------------
+Name of the cron package. Specify this to change the platform's default.
+
+- *Default*: 'USE_DEFAULTS'
 
 ensure_state
 ------------
@@ -204,7 +210,14 @@ Hash for crontab tasks.
 
 - *Default*: undef
 
-### Sample usage:
+service_name
+------------
+Name of the cron service. Specify this to change the platform's default.
+
+- *Default*: 'USE_DEFAULTS'
+
+
+## Sample usage:
 
 **Work on Suse**
 <pre>
