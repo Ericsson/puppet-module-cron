@@ -32,7 +32,9 @@ cause errors. Please see the Hiera example below.
 
 ===
 
-# Parameters
+## Class `cron`
+
+### Parameters
 A value of `'undef'` will use the defaults specified by the module.
 
 
@@ -201,7 +203,7 @@ Hash for crontab tasks.
 
 - *Default*: undef
 
-## Sample usage:
+### Sample usage:
 
 **Work on Suse**
 <pre>
@@ -257,3 +259,26 @@ cron::crontab_tasks:
    'task2':
     - "* 6 * * 7 root echo 'test'"
 </pre>
+
+## Define `cron::fragment`
+
+### Parameters
+
+ensure_cron
+-----------
+The state of the cron job. Valid values are 'present' and 'absent'.
+
+- *Default*: 'absent'
+
+type
+----
+The type of cron job. This generally refers to "/etc/cron.${type}/". Valid
+values are 'd', 'daily', 'weekly', 'monthly' and 'yearly'.
+
+- *Default*: 'daily'
+
+cron_content
+------------
+String to represent contents of cron job.
+
+- *Default*: ''
