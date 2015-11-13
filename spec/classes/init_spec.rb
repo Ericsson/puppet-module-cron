@@ -4,21 +4,28 @@ describe 'cron' do
   file_with_no_entries = File.read(fixtures('file_with_no_entries'))
 
   platforms = {
-    'RedHat' =>
+    'RedHat 6' =>
       {
         :osfamily     => 'RedHat',
         :osrelease    => '6.7',
         :package_name => 'crontabs',
         :service_name => 'crond',
       },
-    'Suse' =>
+    'Suse 11' =>
       {
         :osfamily     => 'Suse',
         :osrelease    => '11.3',
         :package_name => 'cron',
         :service_name => 'cron',
       },
-    'Debian' =>
+    'Suse 12' =>
+      {
+        :osfamily     => 'Suse',
+        :osrelease    => '12.1',
+        :package_name => 'cronie',
+        :service_name => 'cron',
+      },
+    'Debian 7' =>
       {
         :osfamily     => 'Debian',
         :osrelease    => '7.9',
@@ -29,7 +36,7 @@ describe 'cron' do
 
   describe 'with default values for parameters' do
     platforms.sort.each do |k,v|
-      context "where osfamily is <#{v[:osfamily]}>" do
+      context "running on #{k}" do
         let :facts do
           {
             :osfamily               => v[:osfamily],
@@ -146,69 +153,9 @@ describe 'cron' do
     end
   end
 
-  describe 'with default values for parameters on osfamily Suse operatingsystemrelease 12 ' do
-    let :facts do
-      {
-        :osfamily               => 'Suse',
-        :operatingsystemrelease => '12.1',
-      }
-    end
-
-    it {
-      should contain_file('cron_allow').with({
-        'ensure'  => 'absent',
-        'path'    => '/etc/cron.allow',
-        'owner'   => 'root',
-        'group'   => 'root',
-        'mode'    => '0644',
-        'require' => 'Package[cronie]',
-      })
-    }
-
-    it {
-      should contain_file('cron_deny').with({
-        'ensure'  => 'present',
-        'path'    => '/etc/cron.deny',
-        'owner'   => 'root',
-        'group'   => 'root',
-        'mode'    => '0644',
-        'require' => 'Package[cronie]',
-      })
-    }
-
-    it {
-      should contain_package('cronie').with({
-        'ensure' => 'installed',
-        'name'   => 'cronie',
-      })
-    }
-
-    it {
-      should contain_file('crontab').with({
-        'ensure'  => 'present',
-        'path'    => '/etc/crontab',
-        'owner'   => 'root',
-        'group'   => 'root',
-        'mode'    => '0644',
-        'require' => 'Package[cronie]',
-      })
-    }
-
-    it {
-      should contain_service('cron').with({
-        'ensure'    => 'running',
-        'enable'    => true,
-        'name'      => 'cron',
-        'require'   => 'File[crontab]',
-        'subscribe' => 'File[crontab]',
-      })
-    }
-
-  end
-
   describe 'with optional parameters set' do
     platforms.sort.each do |k,v|
-      context "where osfamily is <#{v[:osfamily]}>" do
+      context "running on #{k}" do
         let :facts do
           {
             :osfamily               => v[:osfamily],
@@ -357,7 +304,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
 
@@ -378,7 +325,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
         end
@@ -397,7 +344,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
 
@@ -418,7 +365,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
         end
@@ -437,7 +384,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
         end
@@ -477,7 +424,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
         end
@@ -497,7 +444,7 @@ describe 'cron' do
               'owner'   => 'other',
               'group'   => 'other',
               'mode'    => '0640',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
         end
@@ -629,7 +576,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
           it { should contain_file('cron_allow').with_content(/^Tintin\nMilou$/) }
@@ -649,7 +596,7 @@ describe 'cron' do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'require' => "Package[#{platforms[v[:osfamily]][:package_name]}]",
+              'require' => "Package[#{v[:package_name]}]",
             })
           }
           it { should contain_file('cron_deny').with_content(/^nobody\nanyone$/) }
