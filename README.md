@@ -24,6 +24,7 @@ This module has been tested to work on the following systems with Puppet v3
  * EL 6
  * SLES 10
  * SLES 11
+ * SUSE 12
  * Ubuntu 12
 
 Note that SLES patches ISC's cron such that if cron.allow and cron.deny are
