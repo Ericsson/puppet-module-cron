@@ -647,151 +647,6 @@ describe 'cron' do
           it { should contain_file('crontab').with_content(/^# spec_test\n42 \* \* \* \* nobody echo task1$/) }
 
         end
-
-        context "with crontab_owner specified as a non-string" do
-          let(:params) {{
-            :crontab_owner => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::crontab_owner must be a string/)
-          end
-        end
-
-        context "with cron_dir_owner specified as a non-string" do
-          let(:params) {{
-            :cron_dir_owner => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_dir_owner must be a string/)
-          end
-        end
-
-        context "with cron_allow_owner specified as a non-string" do
-          let(:params) {{
-            :cron_allow_owner => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_allow_owner must be a string/)
-          end
-        end
-
-        context "with cron_deny_owner specified as a non-string" do
-          let(:params) {{
-            :cron_deny_owner => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_deny_owner must be a string/)
-          end
-        end
-
-        context "with crontab_group specified as a non-string" do
-          let(:params) {{
-            :crontab_group => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::crontab_group must be a string/)
-          end
-        end
-
-        context "with cron_dir_group specified as a non-string" do
-          let(:params) {{
-            :cron_dir_group => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_dir_group must be a string/)
-          end
-        end
-
-        context "with cron_allow_group specified as a non-string" do
-          let(:params) {{
-            :cron_allow_group => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_allow_group must be a string/)
-          end
-        end
-
-        context "with cron_deny_group specified as a non-string" do
-          let(:params) {{
-            :cron_deny_group => ['not','a string']
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_deny_group must be a string/)
-          end
-        end
-
-        context "with crontab_mode specified as invalid value" do
-          let(:params) {{
-            :crontab_mode => 'str'
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::crontab_mode must use the standard four-digit octal notation/)
-          end
-        end
-
-        context "with cron_dir_mode specified as invalid value" do
-          let(:params) {{
-            :cron_dir_mode => '770'
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_dir_mode must use the standard four-digit octal notation/)
-          end
-        end
-
-        context "with cron_allow_mode specified as invalid value" do
-          let(:params) {{
-            :cron_allow_mode => 'str'
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_allow_mode must use the standard four-digit octal notation/)
-          end
-        end
-
-        context "with cron_deny_mode specified as invalid value" do
-          let(:params) {{
-            :cron_deny_mode => 'str'
-          }}
-
-          it 'should fail' do
-            expect {
-              should contain_class('cron')
-            }.to raise_error(Puppet::Error,/cron::cron_deny_mode must use the standard four-digit octal notation/)
-          end
-        end
-
       end
     end
   end
@@ -809,8 +664,62 @@ describe 'cron' do
       'absolute_path' => {
         :name    => ['cron_allow_path','cron_deny_path','crontab_path','cron_d_path','cron_hourly_path','cron_daily_path','cron_weekly_path','cron_monthly_path'],
         :valid   => ['/absolute/filepath','/absolute/directory/'],
-        :invalid => ['./invalid',3,2.42,['array'],a={'ha'=>'sh'}],
+        :invalid => ['./invalid',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'is not an absolute path',
+      },
+      'array' => {
+        :name    => ['cron_allow_users','cron_deny_users'],
+        :valid   => [['array'],['val','id']],
+        :invalid => ['string',inv={'al'=>'id'},3,2.42,true,false,nil],
+        :message => 'is not an Array',
+      },
+      # enhancement: validate $cron_files
+      'hash' => {
+        :name    => ['crontab_tasks','crontab_vars'],
+        :valid   => [a={'hash'=>['with','nested','array']} ],
+        :invalid => ['string',['array'],3,2.42,true,false,nil],
+        :message => 'is not a Hash',
+      },
+      # enhancement: should also allow 'file'
+      'regex_file_ensure' => {
+        :name    => ['cron_allow','cron_deny'],
+        :valid   => ['present','absent'],
+        :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be absent or present',
+      },
+      # enhancement: only allow 0-7 instead of 0-9 in regex
+      'regex_file_mode' => {
+        :name    => ['crontab_mode','cron_dir_mode','cron_allow_mode','cron_deny_mode'],
+        :valid   => ['0755','0644','0242'],
+        :invalid => ['invalid','755',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must use the standard four-digit octal notation',
+      },
+      'regex_package_ensure' => {
+        :name    => ['package_ensure'],
+        :valid   => ['present','installed','absent'],
+        :invalid => ['invalid','purged','held','latest',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be absent, present or installed',
+      },
+      # enhancement: should be renamed to $service_enable
+      #              align error messages
+      'regex_service_enable' => {
+        :name    => ['enable_cron'],
+        :valid   => ['true','false',true,false],
+        :invalid => ['invalid',['array'],a={'ha'=>'sh'},3,2.42,nil],
+        :message => 'true[\']? or [\']?false',
+      },
+      # enhancement: should be renamed to $service_ensure
+      'regex_service_ensure' => {
+        :name    => ['ensure_state'],
+        :valid   => ['stopped','running'],
+        :invalid => ['invalid','true','false',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be running or stopped',
+      },
+      'string' => {
+        :name    => ['crontab_owner','cron_allow_owner','cron_deny_owner','cron_dir_owner','crontab_group','cron_allow_group','cron_deny_group','cron_dir_group'],
+        :valid   => ['valid'],
+        :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
+        :message => 'must be a string',
       },
     }
 
