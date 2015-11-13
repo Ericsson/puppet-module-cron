@@ -279,6 +279,10 @@ describe 'cron' do
               'ensure' => 'installed',
             })
           }
+
+          ['cron_allow','cron_deny','crontab','cron_d','cron_hourly','cron_daily','cron_weekly','cron_monthly'].each do |filename|
+            it { should contain_file(filename).with_require('Package[cron2]') }
+          end
         end
 
         context 'where ensure_state is <stopped>' do
