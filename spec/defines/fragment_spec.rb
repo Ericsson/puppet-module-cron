@@ -2,107 +2,99 @@ require 'spec_helper'
 describe 'cron::fragment' do
 
   let(:title) { 'example' }
-  let(:facts) {{
-    :osfamily => 'RedHat',
-  }}
+  let(:facts) { { :osfamily => 'RedHat' } }
 
-
-  context 'create file in /etc/cron.d/ from cron_content' do
-    let(:params) {{
-      :cron_content => '* * * * * root command',
-      :type         => 'd',
-      :ensure_cron  => 'present'
-    }}
-
+  context 'with default values for parameters on valid OS' do
+    it { should compile.with_all_deps }
     it { should contain_class('cron') }
-
     it {
-      should contain_file('/etc/cron.d/example').with({
-        'ensure' => 'present',
-        'owner'  => 'root',
-        'group'  => 'root',
-        'mode'   => '0644',
-      })
-    }
-    it { should contain_file('/etc/cron.d/example').with_content(%{* * * * * root command}) }
-  end
-
-  ['daily','weekly','monthly','yearly'].each do |value|
-    context "create file in /etc/cron.#{value}/ from cron_content" do
-      let(:title) { "example-#{value}" }
-      let(:params) {{
-        :cron_content => '* * * * * root command',
-        :type         => "#{value}",
-        :ensure_cron  => 'present',
-      }}
-
-      it { should contain_class('cron') }
-
-      it {
-        should contain_file("/etc/cron.#{value}/example-#{value}").with({
-          'ensure' => 'present',
-          'owner'  => 'root',
-          'group'  => 'root',
-          'mode'   => '0755',
-        })
-      }
-      it { should contain_file("/etc/cron.#{value}/example-#{value}").with_content(%{* * * * * root command}) }
-    end
-  end
-
-  context 'with ensure_cron specified as <absent>' do
-    let(:params) {{
-      :ensure_cron => 'absent',
-      :type        => 'd',
-    }}
-
-    it { should contain_class('cron') }
-
-    it {
-      should contain_file('/etc/cron.d/example').with({
+      should contain_file('/etc/cron.daily/example').with({
         'ensure'  => 'absent',
         'owner'   => 'root',
         'group'   => 'root',
-        'mode'    => '0644',
+        'mode'    => '0755',
+        'content' => '',
+        'require' => 'File[crontab]',
       })
     }
   end
 
-  context 'with cron_content specified as invalid boolean <true>' do
-    let(:params) {{
-      :cron_content => true
-    }}
-
-    it 'should fail' do
-      expect {
-        should contain_class('cron')
-      }.to raise_error(Puppet::Error,/is not a string./)
+  context 'with optional parameters set' do
+    context 'with cron_content set to <0 0 2 4 2 root command>' do
+      let(:params) { { :cron_content => '0 0 2 4 2 root command' } }
+      it { should contain_file('/etc/cron.daily/example').with_content('0 0 2 4 2 root command') }
     end
-  end
 
-  context 'with type specified as invalid string <biweekly>' do
-    let(:params) {{
-      :type => 'biweekly'
-    }}
-
-    it 'should fail' do
-      expect {
-        should contain_class('cron')
-      }.to raise_error(Puppet::Error,/Valid values are d, daily, weekly, monthly, yearly/)
+    context 'with ensure_cron set to <present>' do
+      let(:params) { { :ensure_cron => 'present' } }
+      it { should contain_file('/etc/cron.daily/example').with_ensure('present') }
     end
-  end
 
-  ['true',true,'false','delete'].each do |value|
-    context "with ensure_cron specified as invalid value <#{value}>" do
-      let(:params) {{
-        :ensure_cron => value
-      }}
+    ['d','daily','monthly','weekly','yearly'].each do |interval|
+      context "when type is set to <#{interval}>" do
+        let (:params) { { :type => "#{interval}"} }
 
-      it 'should fail' do
-        expect {
-          should contain_class('cron')
-        }.to raise_error(Puppet::Error,/cron::fragment::ensure_cron is #{value} and must be absent or present/)
+        if interval == 'd'
+          filemode = '0644'
+        else
+          filemode = '0755'
+        end
+        it { should contain_file("/etc/cron.#{interval}/example").with_mode(filemode) }
       end
     end
   end
+
+  describe 'variable type and content validations' do
+    # set needed custom facts and variables
+    let(:facts) { {
+      :osfamily => 'RedHat',
+    } }
+    let(:validation_params) { {
+#      :param => 'value',
+    } }
+
+    validations = {
+      'regex_file_ensure' => {
+        :name    => ['ensure_cron'],
+        :valid   => ['present','absent'],
+        :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be absent or present',
+      },
+      'regex_type' => {
+        :name    => ['type'],
+        :valid   => ['d','daily','monthly','weekly','yearly'],
+        :invalid => ['biweekly','hourly',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'Valid values are d, daily, weekly, monthly, yearly',
+      },
+      'string' => {
+        :name    => ['cron_content'],
+        :valid   => ['valid'],
+        :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
+        :message => 'must be a string',
+      },
+    }
+
+    validations.sort.each do |type,var|
+      var[:name].each do |var_name|
+
+        var[:valid].each do |valid|
+          context "with #{var_name} (#{type}) set to valid #{valid} (as #{valid.class})" do
+            let(:params) { validation_params.merge({:"#{var_name}" => valid, }) }
+            it { should compile }
+          end
+        end
+
+        var[:invalid].each do |invalid|
+          context "with #{var_name} (#{type}) set to invalid #{invalid} (as #{invalid.class})" do
+            let(:params) { validation_params.merge({:"#{var_name}" => invalid, }) }
+            it 'should fail' do
+              expect {
+                should contain_class(subject)
+              }.to raise_error(Puppet::Error,/#{var[:message]}/)
+            end
+          end
+        end
+      end # var[:name].each
+    end # validations.sort.each
+  end # describe 'variable type and content validations'
 end
