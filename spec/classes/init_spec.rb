@@ -329,6 +329,15 @@ describe 'cron' do
     end
   end
 
+  describe 'with default values for parameters on invalid OS' do
+    let (:facts) { { :osfamily => 'WierdOS'} }
+    it 'should fail' do
+      expect {
+        should contain_class(subject)
+      }.to raise_error(Puppet::Error,/supports osfamilies RedHat, Suse and Debian/)
+    end
+  end
+
   describe 'variable type and content validations' do
     # set needed custom facts and variables
     let(:facts) { {
