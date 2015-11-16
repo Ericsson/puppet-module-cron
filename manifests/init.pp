@@ -115,19 +115,23 @@ class cron (
   validate_absolute_path($cron_weekly_path)
   validate_absolute_path($cron_monthly_path)
 
-  if !is_string($crontab_owner) { fail('cron::crontab_owner must be a string') }
-  if !is_string($cron_allow_owner) { fail('cron::cron_allow_owner must be a string') }
-  if !is_string($cron_deny_owner) { fail('cron::cron_deny_owner must be a string') }
-  if !is_string($cron_dir_owner) { fail('cron::cron_dir_owner must be a string') }
-  if !is_string($crontab_group) { fail('cron::crontab_group must be a string') }
-  if !is_string($cron_allow_group) { fail('cron::cron_allow_group must be a string') }
-  if !is_string($cron_deny_group) { fail('cron::cron_deny_group must be a string') }
-  if !is_string($cron_dir_group) { fail('cron::cron_dir_group must be a string') }
+  validate_string($crontab_owner)
+  validate_string($cron_allow_owner)
+  validate_string($cron_deny_owner)
+  validate_string($cron_dir_owner)
+  validate_string($crontab_group)
+  validate_string($cron_allow_group)
+  validate_string($cron_deny_group)
+  validate_string($cron_dir_group)
 
-  validate_re($crontab_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::crontab_mode must use the standard four-digit octal notation')
-  validate_re($cron_dir_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::cron_dir_mode must use the standard four-digit octal notation')
-  validate_re($cron_allow_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::cron_allow_mode must use the standard four-digit octal notation')
-  validate_re($cron_deny_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::cron_deny_mode must use the standard four-digit octal notation')
+  validate_re($crontab_mode, '^[0-7]{4}$',
+    "cron::crontab_mode is <${crontab_mode}> and must be a valid four digit mode in octal notation.")
+  validate_re($cron_dir_mode, '^[0-7]{4}$',
+    "cron::cron_dir_mode is <${cron_dir_mode}> and must be a valid four digit mode in octal notation.")
+  validate_re($cron_allow_mode, '^[0-7]{4}$',
+    "cron::cron_allow_mode is <${cron_allow_mode}> and must be a valid four digit mode in octal notation.")
+  validate_re($cron_deny_mode, '^[0-7]{4}$',
+    "cron::cron_deny_mode is <${cron_deny_mode}> and must be a valid four digit mode in octal notation.")
 
   # End of validation
 
