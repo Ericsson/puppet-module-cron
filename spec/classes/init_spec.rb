@@ -1,8 +1,6 @@
 require 'spec_helper'
 describe 'cron' do
 
-  default_crontab = File.read(fixtures('default_crontab'))
-
   platforms = {
     'RedHat 6' =>
       {
@@ -50,6 +48,7 @@ describe 'cron' do
         'group'   => 'root',
         'mode'    => '0644',
         'require' => 'Package[crontabs]',
+        'content' => "# This file is being maintained by Puppet.\n# DO NOT EDIT\n",
       })
     }
     it {
@@ -71,7 +70,7 @@ describe 'cron' do
         'group'   => 'root',
         'mode'    => '0644',
         'require' => 'Package[crontabs]',
-        'content' => default_crontab,
+        'content' => File.read(fixtures('default_crontab')),
       })
     }
     it {
@@ -133,6 +132,8 @@ describe 'cron' do
         'subscribe' => 'File[crontab]',
       })
     }
+    it { should have_cron__fragment_resource_count(0) }
+
   end
 
   platforms.sort.each do |k,v|
@@ -158,499 +159,172 @@ describe 'cron' do
   end
 
   describe 'with optional parameters set' do
-    platforms.sort.each do |k,v|
-      context "running on #{k}" do
-        let :facts do
-          {
-            :osfamily               => v[:osfamily],
-            :operatingsystemrelease => v[:osrelease],
-          }
-        end
+    let (:facts) { { :osfamily => 'RedHat'} }
 
-        context 'where enable_cron is <false>' do
-          let :params do
-            {
-              :enable_cron => 'false',
-            }
-          end
+    context 'when cron_allow, cron_allow_group, cron_allow_mode, cron_allow_owner and cron_allow_path are set' do
+      let (:params) do
+        {
+          :cron_allow       => 'present',
+          :cron_allow_group => 'cron_allow_group',
+          :cron_allow_mode  => '0400',
+          :cron_allow_owner => 'cron_allow_owner',
+          :cron_allow_path  => '/spec/cron_allow',
+        }
+      end
 
-          it {
-            should contain_service('cron').with({
-              'ensure'  => 'running',
-              'enable'  => false,
-              'name'    => v[:service_name],
-              'require'   => 'File[crontab]',
-              'subscribe' => 'File[crontab]',
-            })
-          }
-        end
+      it {
+        should contain_file('cron_allow').with({
+          'ensure'  => 'present',
+          'path'    => '/spec/cron_allow',
+          'owner'   => 'cron_allow_owner',
+          'group'   => 'cron_allow_group',
+          'mode'    => '0400',
+        })
+      }
+    end
 
-        context 'where service_name is set' do
-          let :params do
-            {
-              :service_name => 'cron2',
-            }
-          end
+    context 'when cron_deny, cron_deny_group, cron_deny_mode, cron_deny_owner and cron_deny_path are set' do
+      let (:params) do
+        {
+          :cron_deny       => 'absent',
+          :cron_deny_group => 'cron_deny_group',
+          :cron_deny_mode  => '0400',
+          :cron_deny_owner => 'cron_deny_owner',
+          :cron_deny_path  => '/spec/cron_deny',
+        }
+      end
 
-          it {
-            should contain_service('cron').with({
-              'ensure'    => 'running',
-              'enable'    => true,
-              'name'      => 'cron2',
-              'require'   => 'File[crontab]',
-              'subscribe' => 'File[crontab]',
-            })
-          }
-        end
+      it {
+        should contain_file('cron_deny').with({
+          'ensure'  => 'absent',
+          'path'    => '/spec/cron_deny',
+          'owner'   => 'cron_deny_owner',
+          'group'   => 'cron_deny_group',
+          'mode'    => '0400',
+        })
+      }
+    end
 
-        context 'where package_ensure is <absent>' do
-          let :params do
-            {
-              :package_ensure => 'absent',
-            }
-          end
+    context 'when crontab_group, crontab_mode, crontab_owner and crontab_path are set' do
+      let (:params) do
+        {
+          :crontab_group => 'crontab_group',
+          :crontab_mode  => '0400',
+          :crontab_owner => 'crontab_owner',
+          :crontab_path  => '/spec/crontab',
+        }
+      end
+      it {
+        should contain_file('crontab').with({
+          'path'    => '/spec/crontab',
+          'owner'   => 'crontab_owner',
+          'group'   => 'crontab_group',
+          'mode'    => '0400',
+        })
+      }
+    end
 
-          it {
-            should contain_package("#{v[:package_name]}").with({
-              'ensure' => 'absent',
-              'name'   => v[:package_name],
-            })
-          }
-        end
+    context 'when enable_cron, ensure_state and service_name are set' do
+      let (:params) do
+        {
+          :ensure_state => 'stopped',
+          :enable_cron  => false,
+          :service_name => 'vixie',
+        }
+      end
 
-        context 'where package_name is set' do
-          let :params do
-            {
-              :package_name => 'cron2',
-            }
-          end
+      it {
+        should contain_service('cron').with({
+          'ensure' => 'stopped',
+          'enable' => 'false',
+          'name'   => 'vixie',
+        })
+      }
+    end
 
-          it {
-            should contain_package('cron2').with({
-              'ensure' => 'installed',
-            })
-          }
+    context 'when cron_allow_users is set to <[\'spec\',\'test\',\'allow\']>' do
+      let (:params) { { :cron_allow_users => ['spec','test','allow'] } }
+      it { should contain_file('cron_allow').with_content("# This file is being maintained by Puppet.\n# DO NOT EDIT\nspec\ntest\nallow\n") }
+    end
 
-          ['cron_allow','cron_deny','crontab','cron_d','cron_hourly','cron_daily','cron_weekly','cron_monthly'].each do |filename|
-            it { should contain_file(filename).with_require('Package[cron2]') }
-          end
-        end
+    context 'when cron_d_path is set to </spec/cron_d>' do
+      let (:params) { { :cron_d_path => '/spec/cron_d'} }
+      it { should contain_file('cron_d').with_path('/spec/cron_d') }
+    end
 
-        context 'where ensure_state is <stopped>' do
-          let :params do
-            {
-              :ensure_state => 'stopped',
-            }
-          end
+    ['daily','hourly','monthly','weekly'].each do |interval|
+      context "when cron_#{interval}_path is set to </spec/cron_daily>" do
+        let (:params) { { :"cron_#{interval}_path" => "/spec/cron_#{interval}"} }
+        it { should contain_file("cron_#{interval}").with_path("/spec/cron_#{interval}") }
+      end
+    end
 
-          it {
-            should contain_service('cron').with({
-              'ensure'    => 'stopped',
-              'enable'    => true,
-              'name'      => v[:service_name],
-              'require'   => 'File[crontab]',
-              'subscribe' => 'File[crontab]',
-            })
-          }
-        end
+    context 'when cron_deny_users is set to <[\'spec\',\'test\',\'deny\']>' do
+      let (:params) { { :cron_deny_users => ['spec','test','deny'] } }
+      it { should contain_file('cron_deny').with_content("# This file is being maintained by Puppet.\n# DO NOT EDIT\nspec\ntest\ndeny\n") }
+    end
 
-        context 'where crontab_path is </somewhere/else>' do
-          let :params do
-            {
-              :crontab_path => '/somewhere/else',
-            }
-          end
+    context 'when cron_dir_group is set to <cron_dir_group>' do
+      let (:params) { { :cron_dir_group => 'cron_dir_group' } }
+      ['cron_d','cron_daily','cron_hourly','cron_monthly','cron_weekly'].each do |file_resource|
+        it { should contain_file(file_resource).with_group('cron_dir_group') }
+      end
+    end
 
-          it {
-            should contain_file('crontab').with({
-              'ensure'  => 'present',
-              'path'    => '/somewhere/else',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
+    context 'when cron_dir_mode is set to <0242>' do
+      let (:params) { { :cron_dir_mode => '0242' } }
+      ['cron_d','cron_daily','cron_hourly','cron_monthly','cron_weekly'].each do |file_resource|
+        it { should contain_file(file_resource).with_mode('0242') }
+      end
+    end
 
-        context 'where crontab file attributes are specified' do
-          let :params do
-            {
-              :crontab_owner => 'other',
-              :crontab_group => 'other',
-              :crontab_mode => '0640',
-            }
-          end
+    context 'when cron_dir_owner is set to <cron_dir_owner>' do
+      let (:params) { { :cron_dir_owner => 'cron_dir_owner' } }
+      ['cron_d','cron_daily','cron_hourly','cron_monthly','cron_weekly'].each do |file_resource|
+        it { should contain_file(file_resource).with_owner('cron_dir_owner') }
+      end
+    end
 
-          it {
-            should contain_file('crontab').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/crontab',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0640',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
+    context 'when cron_files is set to a valid value that will create two resources' do
+      let (:params) { { :cron_files => {'spec' => {'cron_content'=>'/bin/true'},'test' => {'cron_content'=>'/bin/true'} } } }
+      it { should have_cron__fragment_resource_count(2) }
+      it { should contain_cron__fragment('spec') }
+      it { should contain_cron__fragment('test') }
+    end
 
-        context 'where cron_allow is <present>' do
-          let :params do
-            {
-              :cron_allow => 'present',
-            }
-          end
+    context 'when crontab_tasks is set to a valid value that will create two tasks' do
+      let (:params) { { :crontab_tasks => {'spec' => ['0 0 2 4 2 root /bin/true','1 2 3 4 5 root /bin/false'],'test' => ['5 4 3 2 1 spec /bin/test$'] } } }
+      it { should contain_file('crontab').with_content(/^# spec\n0 0 2 4 2 root \/bin\/true\n1 2 3 4 5 root \/bin\/false\n# test\n5 4 3 2 1 spec \/bin\/test/) }
+    end
 
-          it {
-            should contain_file('cron_allow').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/cron.allow',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
+    # enhancement: move the default values from template to $crontab_vars and remove the without tests below
+    context 'when crontab_vars is set to a valid value' do
+      let (:params) { { :crontab_vars => {'SHELL' => '/bin/sh','PATH' => '/test', 'MAILTO' => 'operator', 'HOME'=>'/test' } } }
+      it { should contain_file('crontab').with_content(/^HOME=\/test$/) }
+      it { should contain_file('crontab').with_content(/^SHELL=\/bin\/sh$/) }
+      it { should contain_file('crontab').with_content(/^PATH=\/test$/) }
+      it { should contain_file('crontab').with_content(/^MAILTO=operator$/) }
+      it { should contain_file('crontab').without_content(/^HOME=\/$/) }
+      it { should contain_file('crontab').without_content(/^SHELL=\/bin\/bash$/) }
+      it { should contain_file('crontab').without_content(/^PATH=\/sbin:\/bin:\/usr\/sbin:\/usr\/bin\$/) }
+      it { should contain_file('crontab').without_content(/^MAILTO=root$/) }
+    end
 
-          it { should contain_file('cron_allow').with_content("# This file is being maintained by Puppet.\n# DO NOT EDIT\n") }
-        end
+    context 'when enable_cron is set to <false>' do
+      let (:params) { { :enable_cron => false } }
+      it { should contain_service('cron').with_enable('false') }
+    end
 
-        context 'where cron_allow is <absent>' do
-          let :params do
-            {
-              :cron_allow => 'absent',
-            }
-          end
+    context 'when package_ensure is set to <absent>' do
+      let (:params) { { :package_ensure => 'absent' } }
+      it { should contain_package('crontabs').with_ensure('absent') }
+    end
 
-          it {
-            should contain_file('cron_allow').with({
-              'ensure'  => 'absent',
-              'path'    => '/etc/cron.allow',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron_deny is <present>' do
-          let :params do
-            {
-              :cron_deny => 'present',
-            }
-          end
-
-          it {
-            should contain_file('cron_deny').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/cron.deny',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-
-          it { should contain_file('cron_deny').with_content("# This file is being maintained by Puppet.\n# DO NOT EDIT\n") }
-        end
-
-        context 'where cron_deny is <absent>' do
-          let :params do
-            {
-              :cron_deny => 'absent',
-            }
-          end
-
-          it {
-            should contain_file('cron_deny').with({
-              'ensure'  => 'absent',
-              'path'    => '/etc/cron.deny',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron_allow_path is </somwhere/else/allow>' do
-          let :params do
-            {
-              :cron_allow_path => '/somwhere/else/allow',
-            }
-          end
-
-          it {
-            should contain_file('cron_allow').with({
-              'ensure'  => 'absent',
-              'path'    => '/somwhere/else/allow',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron_allow file attributes are specified' do
-          let :params do
-            {
-              :cron_allow_owner => 'other',
-              :cron_allow_group => 'other',
-              :cron_allow_mode => '0640',
-            }
-          end
-
-          it {
-            should contain_file('cron_allow').with({
-              'ensure'  => 'absent',
-              'path'    => '/etc/cron.allow',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0640',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron_deny_path is </somewhere/else/deny>' do
-          let :params do
-            {
-              :cron_deny_path => '/somewhere/else/deny',
-            }
-          end
-
-          it {
-            should contain_file('cron_deny').with({
-              'ensure'  => 'present',
-              'path'    => '/somewhere/else/deny',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron_deny file attributes are specified' do
-          let :params do
-            {
-              :cron_deny_owner => 'other',
-              :cron_deny_group => 'other',
-              :cron_deny_mode => '0640',
-            }
-          end
-          it {
-            should contain_file('cron_deny').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/cron.deny',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0640',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron.d file attributes are specified' do
-          let :params do
-            {
-              :cron_d_path  => '/other/cron.d',
-              :cron_dir_owner => 'other',
-              :cron_dir_group => 'other',
-              :cron_dir_mode  => '0750',
-            }
-          end
-
-          it {
-            should contain_file('cron_d').with({
-              'ensure'  => 'directory',
-              'path'    => '/other/cron.d',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0750',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron.hourly file attributes are specified' do
-          let :params do
-            {
-              :cron_hourly_path  => '/other/cron.hourly',
-              :cron_dir_owner => 'other',
-              :cron_dir_group => 'other',
-              :cron_dir_mode  => '0750',
-            }
-          end
-
-          it {
-            should contain_file('cron_hourly').with({
-              'ensure'  => 'directory',
-              'path'    => '/other/cron.hourly',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0750',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron.daily file attributes are specified' do
-          let :params do
-            {
-              :cron_daily_path  => '/other/cron.daily',
-              :cron_dir_owner => 'other',
-              :cron_dir_group => 'other',
-              :cron_dir_mode  => '0750',
-            }
-          end
-
-          it {
-            should contain_file('cron_daily').with({
-              'ensure'  => 'directory',
-              'path'    => '/other/cron.daily',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0750',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron.weekly file attributes are specified' do
-          let :params do
-            {
-              :cron_weekly_path  => '/other/cron.weekly',
-              :cron_dir_owner => 'other',
-              :cron_dir_group => 'other',
-              :cron_dir_mode  => '0750',
-            }
-          end
-
-          it {
-            should contain_file('cron_weekly').with({
-              'ensure'  => 'directory',
-              'path'    => '/other/cron.weekly',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0750',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-        context 'where cron.monthly file attributes are specified' do
-          let :params do
-            {
-              :cron_monthly_path  => '/other/cron.monthly',
-              :cron_dir_owner => 'other',
-              :cron_dir_group => 'other',
-              :cron_dir_mode  => '0750',
-            }
-          end
-
-          it {
-            should contain_file('cron_monthly').with({
-              'ensure'  => 'directory',
-              'path'    => '/other/cron.monthly',
-              'owner'   => 'other',
-              'group'   => 'other',
-              'mode'    => '0750',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-        end
-
-# TODO: test for cron_files
-
-        context 'where cron_allow is <present> and cron_allow_users is <[ \'Tintin\', \'Milou\' ]>' do
-          let :params do
-            {
-              :cron_allow       => 'present',
-              :cron_allow_users => [ 'Tintin', 'Milou', ],
-            }
-          end
-
-          it {
-            should contain_file('cron_allow').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/cron.allow',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-          it { should contain_file('cron_allow').with_content(/^Tintin\nMilou$/) }
-        end
-
-        context 'where cron_deny_users is <[ \'nobody\', \'anyone\' ]>' do
-          let :params do
-            {
-              :cron_deny_users => [ 'nobody', 'anyone', ],
-            }
-          end
-
-          it {
-            should contain_file('cron_deny').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/cron.deny',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-          it { should contain_file('cron_deny').with_content(/^nobody\nanyone$/) }
-        end
-
-        context 'where crontab_vars is <{ \'MAILTO\' => \'operator\', \'SHELL\' => \'/bin/tcsh\' }>' do
-          let :params do
-            {
-              :crontab_vars => {
-                'MAILTO' => 'operator',
-                'SHELL'  => '/bin/tcsh',
-              }
-            }
-          end
-
-          it {
-            should contain_file('crontab').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/crontab',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-          it { should contain_file('crontab').with_content(/^MAILTO=operator\nSHELL=\/bin\/tcsh$/) }
-        end
-
-        context 'where crontab_tasks is <{ spec_test => [ \'42 * * * * nobody echo task1\' ]>' do
-          let :params do
-            {
-              :crontab_tasks => {
-                'spec_test' => [ '42 * * * * nobody echo task1' ],
-              }
-            }
-          end
-
-          it {
-            should contain_file('crontab').with({
-              'ensure'  => 'present',
-              'path'    => '/etc/crontab',
-              'owner'   => 'root',
-              'group'   => 'root',
-              'mode'    => '0644',
-              'require' => "Package[#{v[:package_name]}]",
-            })
-          }
-          it { should contain_file('crontab').with_content(/^# spec_test\n42 \* \* \* \* nobody echo task1$/) }
-
-        end
+    context 'when package_name is set to <cron242>' do
+      let (:params) { { :package_name => 'cron242' } }
+      it { should contain_package('cron242') }
+      ['cron_allow','cron_deny','crontab','cron_d','cron_hourly','cron_daily','cron_weekly','cron_monthly'].each do |filename|
+        it { should contain_file(filename).with_require('Package[cron242]') }
       end
     end
   end
