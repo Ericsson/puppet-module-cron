@@ -374,12 +374,11 @@ describe 'cron' do
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be absent or present',
       },
-      # enhancement: only allow 0-7 instead of 0-9 in regex
       'regex_file_mode' => {
         :name    => ['crontab_mode','cron_dir_mode','cron_allow_mode','cron_deny_mode'],
         :valid   => ['0755','0644','0242'],
-        :invalid => ['invalid','755',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'must use the standard four-digit octal notation',
+        :invalid => ['invalid','755',0755,'0980',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be a valid four digit mode in octal notation',
       },
       'regex_package_ensure' => {
         :name    => ['package_ensure'],
