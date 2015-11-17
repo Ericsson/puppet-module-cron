@@ -116,14 +116,14 @@ class cron (
   validate_absolute_path($cron_weekly_path)
   validate_absolute_path($cron_monthly_path)
 
-  if !is_string($crontab_owner) { fail('cron::crontab_owner must be a string') }
-  if !is_string($cron_allow_owner) { fail('cron::cron_allow_owner must be a string') }
-  if !is_string($cron_deny_owner) { fail('cron::cron_deny_owner must be a string') }
-  if !is_string($cron_dir_owner) { fail('cron::cron_dir_owner must be a string') }
-  if !is_string($crontab_group) { fail('cron::crontab_group must be a string') }
-  if !is_string($cron_allow_group) { fail('cron::cron_allow_group must be a string') }
-  if !is_string($cron_deny_group) { fail('cron::cron_deny_group must be a string') }
-  if !is_string($cron_dir_group) { fail('cron::cron_dir_group must be a string') }
+  if is_string($cron_allow_group) == false { fail('cron::cron_allow_group must be a string') }
+  if is_string($cron_allow_owner) == false { fail('cron::cron_allow_owner must be a string') }
+  if is_string($cron_deny_group)  == false { fail('cron::cron_deny_group must be a string') }
+  if is_string($cron_deny_owner)  == false { fail('cron::cron_deny_owner must be a string') }
+  if is_string($cron_dir_group)   == false { fail('cron::cron_dir_group must be a string') }
+  if is_string($cron_dir_owner)   == false { fail('cron::cron_dir_owner must be a string') }
+  if is_string($crontab_group)    == false { fail('cron::crontab_group must be a string') }
+  if is_string($crontab_owner)    == false { fail('cron::crontab_owner must be a string') }
 
   validate_re($crontab_mode, '^[0-7]{4}$',
     "cron::crontab_mode is <${crontab_mode}> and must be a valid four digit mode in octal notation.")
