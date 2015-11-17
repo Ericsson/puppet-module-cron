@@ -11,7 +11,7 @@ define cron::fragment (
   include cron
 
   validate_re($ensure_cron, '^(absent)|(present)$', "cron::fragment::ensure_cron is ${ensure_cron} and must be absent or present")
-  validate_string($cron_content)
+  if is_string($cron_content) == false { fail('cron::fragment::cron_content must be a string') }
 
   case $type {
     'd': {
@@ -32,6 +32,6 @@ define cron::fragment (
     owner   => 'root',
     group   => 'root',
     mode    => $cron_mode,
-    require => Package[$cron::package_name],
+    require => File[crontab],
   }
 }
