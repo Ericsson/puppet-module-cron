@@ -360,8 +360,13 @@ describe 'cron' do
         :invalid => ['string',inv={'al'=>'id'},3,2.42,true,false,nil],
         :message => 'is not an Array',
       },
-      # enhancement: validate $cron_files
       'hash' => {
+        :name    => ['cron_files'],
+        :valid   => ['a'=>{'type'=>'d'}],
+        :invalid => ['string',['array'],3,2.42,true,false,nil],
+        :message => 'is not a Hash',
+      },
+      'hash_nested_array' => {
         :name    => ['crontab_tasks','crontab_vars'],
         :valid   => [a={'hash'=>['with','nested','array']} ],
         :invalid => ['string',['array'],3,2.42,true,false,nil],

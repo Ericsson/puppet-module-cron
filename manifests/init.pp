@@ -97,6 +97,7 @@ class cron (
     validate_array($cron_deny_users)
   }
   if $cron_files != undef {
+    validate_hash($cron_files)
     create_resources(cron::fragment,$cron_files)
   }
   if $crontab_tasks != undef {
