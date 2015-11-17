@@ -39,21 +39,21 @@ class cron (
 
   case $::osfamily {
     'Debian': {
-      $default_package_name = 'cron'
-      $default_service_name = 'cron'
+      $package_name_default = 'cron'
+      $service_name_default = 'cron'
     }
     'Suse': {
       if $::operatingsystemrelease =~ /^12\./ {
-        $default_package_name = 'cronie'
-        $default_service_name = 'cron'
+        $package_name_default = 'cronie'
+        $service_name_default = 'cron'
       } else {
-        $default_package_name = 'cron'
-        $default_service_name = 'cron'
+        $package_name_default = 'cron'
+        $service_name_default = 'cron'
       }
     }
     'RedHat': {
-      $default_package_name = 'crontabs'
-      $default_service_name = 'crond'
+      $package_name_default = 'crontabs'
+      $service_name_default = 'crond'
     }
     default: {
       fail("cron supports osfamilies RedHat, Suse and Debian. Detected osfamily is <${::osfamily}>.")
@@ -61,33 +61,33 @@ class cron (
   }
 
   if $package_name == 'USE_DEFAULTS' {
-    $package_name_real = $default_package_name
+    $package_name_real = $package_name_default
   } else {
     $package_name_real = $package_name
   }
 
   if $service_name == 'USE_DEFAULTS' {
-    $service_name_real = $default_service_name
+    $service_name_real = $service_name_default
   } else {
     $service_name_real = $service_name
   }
 
   # Validation
-  validate_re($ensure_state, '^(running)|(stopped)$', "cron::ensure_state is ${ensure_state} and must be running or stopped")
-  validate_re($package_ensure, '^(present)|(installed)|(absent)$', "cron::package_ensure is ${package_ensure} and must be absent, present or installed")
-  validate_re($cron_allow, '^(present)|(absent)$', "cron::cron_allow is ${cron_allow} and must be absent or present")
-  validate_re($cron_deny, '^(present)|(absent)$', "cron::cron_deny is ${cron_deny} and must be absent or present")
+  validate_re($ensure_state, '^(running)|(stopped)$', "cron::ensure_state is <${ensure_state}> and must be running or stopped")
+  validate_re($package_ensure, '^(present)|(installed)|(absent)$', "cron::package_ensure is <${package_ensure}> and must be absent, present or installed")
+  validate_re($cron_allow, '^(absent|file|present)$', "cron::cron_allow is <${cron_allow}> and must be absent, file or present")
+  validate_re($cron_deny, '^(absent|file|present)$', "cron::cron_deny is <${cron_deny}> and must be absent, file or present")
 
   case type3x($enable_cron) {
     'string': {
-      validate_re($enable_cron, '^(true|false)$', "cron::enable_cron may be either 'true' or 'false' and is set to <${enable_cron}>")
+      validate_re($enable_cron, '^(true|false)$', "cron::enable_cron is <${enable_cron}> and must be true or false.")
       $enable_cron_real = str2bool($enable_cron)
     }
     'boolean': {
       $enable_cron_real = $enable_cron
     }
     default: {
-      fail('cron::enable_cron type must be true or false.')
+      fail('cron::enable_cron is <${enable_cron}> and must be true or false.')
     }
   }
   if $cron_allow_users != undef {
@@ -97,6 +97,7 @@ class cron (
     validate_array($cron_deny_users)
   }
   if $cron_files != undef {
+    validate_hash($cron_files)
     create_resources(cron::fragment,$cron_files)
   }
   if $crontab_tasks != undef {
@@ -115,19 +116,23 @@ class cron (
   validate_absolute_path($cron_weekly_path)
   validate_absolute_path($cron_monthly_path)
 
-  if !is_string($crontab_owner) { fail('cron::crontab_owner must be a string') }
-  if !is_string($cron_allow_owner) { fail('cron::cron_allow_owner must be a string') }
-  if !is_string($cron_deny_owner) { fail('cron::cron_deny_owner must be a string') }
-  if !is_string($cron_dir_owner) { fail('cron::cron_dir_owner must be a string') }
-  if !is_string($crontab_group) { fail('cron::crontab_group must be a string') }
-  if !is_string($cron_allow_group) { fail('cron::cron_allow_group must be a string') }
-  if !is_string($cron_deny_group) { fail('cron::cron_deny_group must be a string') }
-  if !is_string($cron_dir_group) { fail('cron::cron_dir_group must be a string') }
+  if is_string($cron_allow_group) == false { fail('cron::cron_allow_group must be a string') }
+  if is_string($cron_allow_owner) == false { fail('cron::cron_allow_owner must be a string') }
+  if is_string($cron_deny_group)  == false { fail('cron::cron_deny_group must be a string') }
+  if is_string($cron_deny_owner)  == false { fail('cron::cron_deny_owner must be a string') }
+  if is_string($cron_dir_group)   == false { fail('cron::cron_dir_group must be a string') }
+  if is_string($cron_dir_owner)   == false { fail('cron::cron_dir_owner must be a string') }
+  if is_string($crontab_group)    == false { fail('cron::crontab_group must be a string') }
+  if is_string($crontab_owner)    == false { fail('cron::crontab_owner must be a string') }
 
-  validate_re($crontab_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::crontab_mode must use the standard four-digit octal notation')
-  validate_re($cron_dir_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::cron_dir_mode must use the standard four-digit octal notation')
-  validate_re($cron_allow_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::cron_allow_mode must use the standard four-digit octal notation')
-  validate_re($cron_deny_mode, '^[0-9][0-9][0-9][0-9]$', 'cron::cron_deny_mode must use the standard four-digit octal notation')
+  validate_re($crontab_mode, '^[0-7]{4}$',
+    "cron::crontab_mode is <${crontab_mode}> and must be a valid four digit mode in octal notation.")
+  validate_re($cron_dir_mode, '^[0-7]{4}$',
+    "cron::cron_dir_mode is <${cron_dir_mode}> and must be a valid four digit mode in octal notation.")
+  validate_re($cron_allow_mode, '^[0-7]{4}$',
+    "cron::cron_allow_mode is <${cron_allow_mode}> and must be a valid four digit mode in octal notation.")
+  validate_re($cron_deny_mode, '^[0-7]{4}$',
+    "cron::cron_deny_mode is <${cron_deny_mode}> and must be a valid four digit mode in octal notation.")
 
   # End of validation
 

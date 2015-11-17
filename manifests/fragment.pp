@@ -10,7 +10,7 @@ define cron::fragment (
 
   include cron
 
-  validate_re($ensure_cron, '^(absent)|(present)$', "cron::fragment::ensure_cron is ${ensure_cron} and must be absent or present")
+  validate_re($ensure_cron, '^(absent|file|present)$', "cron::fragment::ensure_cron is ${cron::fragment::cron_deny} and must be absent, file or present")
   if is_string($cron_content) == false { fail('cron::fragment::cron_content must be a string') }
 
   case $type {

@@ -360,26 +360,29 @@ describe 'cron' do
         :invalid => ['string',inv={'al'=>'id'},3,2.42,true,false,nil],
         :message => 'is not an Array',
       },
-      # enhancement: validate $cron_files
       'hash' => {
+        :name    => ['cron_files'],
+        :valid   => ['a'=>{'type'=>'d'}],
+        :invalid => ['string',['array'],3,2.42,true,false,nil],
+        :message => 'is not a Hash',
+      },
+      'hash_nested_array' => {
         :name    => ['crontab_tasks','crontab_vars'],
         :valid   => [a={'hash'=>['with','nested','array']} ],
         :invalid => ['string',['array'],3,2.42,true,false,nil],
         :message => 'is not a Hash',
       },
-      # enhancement: should also allow 'file'
       'regex_file_ensure' => {
         :name    => ['cron_allow','cron_deny'],
-        :valid   => ['present','absent'],
+        :valid   => ['absent','file','present'],
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'must be absent or present',
+        :message => 'must be absent, file or present',
       },
-      # enhancement: only allow 0-7 instead of 0-9 in regex
       'regex_file_mode' => {
         :name    => ['crontab_mode','cron_dir_mode','cron_allow_mode','cron_deny_mode'],
         :valid   => ['0755','0644','0242'],
-        :invalid => ['invalid','755',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'must use the standard four-digit octal notation',
+        :invalid => ['invalid','755',0755,'0980',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be a valid four digit mode in octal notation',
       },
       'regex_package_ensure' => {
         :name    => ['package_ensure'],
@@ -388,12 +391,11 @@ describe 'cron' do
         :message => 'must be absent, present or installed',
       },
       # enhancement: should be renamed to $service_enable
-      #              align error messages
       'regex_service_enable' => {
         :name    => ['enable_cron'],
         :valid   => ['true','false',true,false],
         :invalid => ['invalid',['array'],a={'ha'=>'sh'},3,2.42,nil],
-        :message => 'true[\']? or [\']?false',
+        :message => 'must be true or false',
       },
       # enhancement: should be renamed to $service_ensure
       'regex_service_ensure' => {

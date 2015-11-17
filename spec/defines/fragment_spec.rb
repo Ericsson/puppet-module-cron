@@ -56,9 +56,9 @@ describe 'cron::fragment' do
     validations = {
       'regex_file_ensure' => {
         :name    => ['ensure_cron'],
-        :valid   => ['present','absent'],
+        :valid   => ['absent','file','present'],
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'must be absent or present',
+        :message => 'must be absent, file or present',
       },
       'regex_type' => {
         :name    => ['type'],
