@@ -224,12 +224,12 @@ describe 'cron' do
       }
     end
 
-    context 'when enable_cron, ensure_state and service_name are set' do
+    context 'when service_enable, service_ensure and service_name are set' do
       let (:params) do
         {
-          :ensure_state => 'stopped',
-          :enable_cron  => false,
-          :service_name => 'vixie',
+          :service_ensure => 'stopped',
+          :service_enable => false,
+          :service_name   => 'vixie',
         }
       end
 
@@ -310,8 +310,8 @@ describe 'cron' do
       it { should contain_file('crontab').without_content(/^MAILTO=root$/) }
     end
 
-    context 'when enable_cron is set to <false>' do
-      let (:params) { { :enable_cron => false } }
+    context 'when service_enable is set to <false>' do
+      let (:params) { { :service_enable => false } }
       it { should contain_service('cron').with_enable('false') }
     end
 
@@ -390,16 +390,14 @@ describe 'cron' do
         :invalid => ['invalid','purged','held','latest',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be absent, present or installed',
       },
-      # enhancement: should be renamed to $service_enable
       'regex_service_enable' => {
-        :name    => ['enable_cron'],
+        :name    => ['service_enable'],
         :valid   => ['true','false',true,false],
         :invalid => ['invalid',['array'],a={'ha'=>'sh'},3,2.42,nil],
         :message => 'must be true or false',
       },
-      # enhancement: should be renamed to $service_ensure
       'regex_service_ensure' => {
-        :name    => ['ensure_state'],
+        :name    => ['service_ensure'],
         :valid   => ['stopped','running'],
         :invalid => ['invalid','true','false',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be running or stopped',
