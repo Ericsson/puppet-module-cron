@@ -39,21 +39,21 @@ class cron (
 
   case $::osfamily {
     'Debian': {
-      $default_package_name = 'cron'
-      $default_service_name = 'cron'
+      $package_name_default = 'cron'
+      $service_name_default = 'cron'
     }
     'Suse': {
       if $::operatingsystemrelease =~ /^12\./ {
-        $default_package_name = 'cronie'
-        $default_service_name = 'cron'
+        $package_name_default = 'cronie'
+        $service_name_default = 'cron'
       } else {
-        $default_package_name = 'cron'
-        $default_service_name = 'cron'
+        $package_name_default = 'cron'
+        $service_name_default = 'cron'
       }
     }
     'RedHat': {
-      $default_package_name = 'crontabs'
-      $default_service_name = 'crond'
+      $package_name_default = 'crontabs'
+      $service_name_default = 'crond'
     }
     default: {
       fail("cron supports osfamilies RedHat, Suse and Debian. Detected osfamily is <${::osfamily}>.")
@@ -61,13 +61,13 @@ class cron (
   }
 
   if $package_name == 'USE_DEFAULTS' {
-    $package_name_real = $default_package_name
+    $package_name_real = $package_name_default
   } else {
     $package_name_real = $package_name
   }
 
   if $service_name == 'USE_DEFAULTS' {
-    $service_name_real = $default_service_name
+    $service_name_real = $service_name_default
   } else {
     $service_name_real = $service_name
   }
