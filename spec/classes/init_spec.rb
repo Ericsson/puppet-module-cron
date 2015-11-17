@@ -391,12 +391,11 @@ describe 'cron' do
         :message => 'must be absent, present or installed',
       },
       # enhancement: should be renamed to $service_enable
-      #              align error messages
       'regex_service_enable' => {
         :name    => ['enable_cron'],
         :valid   => ['true','false',true,false],
         :invalid => ['invalid',['array'],a={'ha'=>'sh'},3,2.42,nil],
-        :message => 'true[\']? or [\']?false',
+        :message => 'must be true or false',
       },
       # enhancement: should be renamed to $service_ensure
       'regex_service_ensure' => {
