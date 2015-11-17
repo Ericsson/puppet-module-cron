@@ -367,12 +367,11 @@ describe 'cron' do
         :invalid => ['string',['array'],3,2.42,true,false,nil],
         :message => 'is not a Hash',
       },
-      # enhancement: should also allow 'file'
       'regex_file_ensure' => {
         :name    => ['cron_allow','cron_deny'],
-        :valid   => ['present','absent'],
+        :valid   => ['absent','file','present'],
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'must be absent or present',
+        :message => 'must be absent, file or present',
       },
       'regex_file_mode' => {
         :name    => ['crontab_mode','cron_dir_mode','cron_allow_mode','cron_deny_mode'],

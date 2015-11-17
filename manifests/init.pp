@@ -75,8 +75,8 @@ class cron (
   # Validation
   validate_re($ensure_state, '^(running)|(stopped)$', "cron::ensure_state is ${ensure_state} and must be running or stopped")
   validate_re($package_ensure, '^(present)|(installed)|(absent)$', "cron::package_ensure is ${package_ensure} and must be absent, present or installed")
-  validate_re($cron_allow, '^(present)|(absent)$', "cron::cron_allow is ${cron_allow} and must be absent or present")
-  validate_re($cron_deny, '^(present)|(absent)$', "cron::cron_deny is ${cron_deny} and must be absent or present")
+  validate_re($cron_allow, '^(absent|file|present)$', "cron::cron_allow is ${cron_allow} and must be absent, file or present")
+  validate_re($cron_deny, '^(absent|file|present)$', "cron::cron_deny is ${cron_deny} and must be absent, file or present")
 
   case type3x($enable_cron) {
     'string': {
