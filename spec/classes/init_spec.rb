@@ -224,12 +224,12 @@ describe 'cron' do
       }
     end
 
-    context 'when enable_cron, ensure_state and service_name are set' do
+    context 'when service_enable, service_ensure and service_name are set' do
       let (:params) do
         {
-          :ensure_state => 'stopped',
-          :enable_cron  => false,
-          :service_name => 'vixie',
+          :service_ensure => 'stopped',
+          :service_enable => false,
+          :service_name   => 'vixie',
         }
       end
 
@@ -286,7 +286,7 @@ describe 'cron' do
     end
 
     context 'when cron_files is set to a valid value that will create two resources' do
-      let (:params) { { :cron_files => {'spec' => {'cron_content'=>'/bin/true'},'test' => {'cron_content'=>'/bin/true'} } } }
+      let (:params) { { :cron_files => {'spec' => {'content'=>'/bin/true'},'test' => {'content'=>'/bin/true'} } } }
       it { should have_cron__fragment_resource_count(2) }
       it { should contain_cron__fragment('spec') }
       it { should contain_cron__fragment('test') }
@@ -310,8 +310,8 @@ describe 'cron' do
       it { should contain_file('crontab').without_content(/^MAILTO=root$/) }
     end
 
-    context 'when enable_cron is set to <false>' do
-      let (:params) { { :enable_cron => false } }
+    context 'when service_enable is set to <false>' do
+      let (:params) { { :service_enable => false } }
       it { should contain_service('cron').with_enable('false') }
     end
 
@@ -335,6 +335,26 @@ describe 'cron' do
       expect {
         should contain_class(subject)
       }.to raise_error(Puppet::Error,/supports osfamilies RedHat, Suse and Debian/)
+    end
+  end
+
+  [true,false,'true','false'].each do |value|
+    describe "with deprecated parameter enable_cron set to #{value} (as #{value.class})" do
+      let (:facts) { { :osfamily => 'RedHat'} }
+      let (:params) { { :enable_cron => value} }
+
+      it { should contain_notify('*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!') }
+      it { should contain_service('cron').with_enable(value) }
+    end
+  end
+
+  ['running','stopped'].each do |value|
+    describe "with deprecated parameter ensure_state set to #{value}" do
+      let (:facts) { { :osfamily => 'RedHat'} }
+      let (:params) { { :ensure_state => value} }
+
+      it { should contain_notify('*** DEPRECATION WARNING***: $ensure_state was renamed to $service_ensure. Please update your configuration. Support for $ensure_state will be removed in the near future!') }
+      it { should contain_service('cron').with_ensure(value) }
     end
   end
 
@@ -390,16 +410,14 @@ describe 'cron' do
         :invalid => ['invalid','purged','held','latest',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be absent, present or installed',
       },
-      # enhancement: should be renamed to $service_enable
       'regex_service_enable' => {
-        :name    => ['enable_cron'],
+        :name    => ['service_enable'],
         :valid   => ['true','false',true,false],
         :invalid => ['invalid',['array'],a={'ha'=>'sh'},3,2.42,nil],
         :message => 'must be true or false',
       },
-      # enhancement: should be renamed to $service_ensure
       'regex_service_ensure' => {
-        :name    => ['ensure_state'],
+        :name    => ['service_ensure'],
         :valid   => ['stopped','running'],
         :invalid => ['invalid','true','false',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be running or stopped',

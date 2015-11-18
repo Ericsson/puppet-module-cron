@@ -39,12 +39,6 @@ cause errors. Please see the Hiera example below.
 A value of `'undef'` will use the defaults specified by the module.
 
 
-enable_cron
------------
-Boolean to enable the cron service.
-
-- *Default*: true
-
 package_ensure
 --------------
 String for the ensure parameter for the cron package. Valid values are 'installed', 'present' and 'absent'.
@@ -56,12 +50,6 @@ package_name
 Name of the cron package. Specify this to change the platform's default.
 
 - *Default*: 'USE_DEFAULTS'
-
-ensure_state
-------------
-String for the ensure parameter for the cron service. Valid values are 'running' and 'stopped'.
-
-- *Default*: 'running'
 
 crontab_path
 ------------
@@ -185,7 +173,6 @@ Name of the owner of the cron_deny file.
 
 - *Default*: 'root'
 
-
 cron_deny_group (string)
 ------------------------
 Name of the group of the cron_deny file.
@@ -209,6 +196,18 @@ crontab_tasks
 Hash for crontab tasks.
 
 - *Default*: undef
+
+service_enable
+--------------
+Boolean to enable the cron service.
+
+- *Default*: true
+
+service_ensure
+--------------
+String for the ensure parameter for the cron service. Valid values are 'running' and 'stopped'.
+
+- *Default*: 'running'
 
 service_name
 ------------
@@ -278,9 +277,9 @@ cron::crontab_tasks:
 
 ### Parameters
 
-ensure_cron
------------
-The state of the cron job. Valid values are 'present' and 'absent'.
+ensure
+------
+String for the ensure parameter of the cron fragment file. Valid values are 'absent', 'file' and 'present'.
 
 - *Default*: 'absent'
 
@@ -291,8 +290,8 @@ values are 'd', 'daily', 'weekly', 'monthly' and 'yearly'.
 
 - *Default*: 'daily'
 
-cron_content
-------------
+content
+-------
 String to represent contents of cron job.
 
 - *Default*: ''

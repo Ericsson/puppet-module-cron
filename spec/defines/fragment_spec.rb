@@ -20,13 +20,13 @@ describe 'cron::fragment' do
   end
 
   context 'with optional parameters set' do
-    context 'with cron_content set to <0 0 2 4 2 root command>' do
-      let(:params) { { :cron_content => '0 0 2 4 2 root command' } }
+    context 'with content set to <0 0 2 4 2 root command>' do
+      let(:params) { { :content => '0 0 2 4 2 root command' } }
       it { should contain_file('/etc/cron.daily/example').with_content('0 0 2 4 2 root command') }
     end
 
-    context 'with ensure_cron set to <present>' do
-      let(:params) { { :ensure_cron => 'present' } }
+    context 'with ensure set to <present>' do
+      let(:params) { { :ensure => 'present' } }
       it { should contain_file('/etc/cron.daily/example').with_ensure('present') }
     end
 
@@ -44,6 +44,22 @@ describe 'cron::fragment' do
     end
   end
 
+  ['absent','file','present'].each do |value|
+    describe "with deprecated parameter ensure_cron set to #{value} (as #{value.class})" do
+      let (:params) { { :ensure_cron => value} }
+
+      it { should contain_notify('*** DEPRECATION WARNING***: $cron::fragment::ensure_cron was renamed to $ensure. Please update your configuration. Support for $ensure_cron will be removed in the near future!') }
+      it { should contain_file('/etc/cron.daily/example').with_ensure(value) }
+    end
+  end
+
+  describe "with deprecated parameter cron_content set to <0 0 2 4 2 root deprecated>" do
+    let (:params) { { :cron_content => '0 0 2 4 2 root deprecated'} }
+
+    it { should contain_notify('*** DEPRECATION WARNING***: $cron::fragment::cron_content was renamed to $content. Please update your configuration. Support for $cron_content will be removed in the near future!') }
+    it { should contain_file('/etc/cron.daily/example').with_content('0 0 2 4 2 root deprecated') }
+  end
+
   describe 'variable type and content validations' do
     # set needed custom facts and variables
     let(:facts) { {
@@ -55,7 +71,7 @@ describe 'cron::fragment' do
 
     validations = {
       'regex_file_ensure' => {
-        :name    => ['ensure_cron'],
+        :name    => ['ensure'],
         :valid   => ['absent','file','present'],
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be absent, file or present',
@@ -64,10 +80,10 @@ describe 'cron::fragment' do
         :name    => ['type'],
         :valid   => ['d','daily','monthly','weekly','yearly'],
         :invalid => ['biweekly','hourly',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'Valid values are d, daily, weekly, monthly, yearly',
+        :message => 'must be d, daily, monthly, weekly or yearly',
       },
       'string' => {
-        :name    => ['cron_content'],
+        :name    => ['content'],
         :valid   => ['valid'],
         :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
         :message => 'must be a string',

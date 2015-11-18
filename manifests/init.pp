@@ -3,10 +3,8 @@
 # This module manages cron
 #
 class cron (
-  $enable_cron        = true,
   $package_ensure     = 'installed',
   $package_name       = 'USE_DEFAULTS',
-  $ensure_state       = 'running',
   $crontab_path       = '/etc/crontab',
   $crontab_owner      = 'root',
   $crontab_group      = 'root',
@@ -34,8 +32,27 @@ class cron (
   $cron_deny_users    = undef,
   $crontab_vars       = undef,
   $crontab_tasks      = undef,
+  $service_enable     = true,
+  $service_ensure     = 'running',
   $service_name       = 'USE_DEFAULTS',
+  # deprecated
+  $enable_cron        = undef,
+  $ensure_state       = undef,
 ) {
+
+  if $enable_cron != undef {
+    notify { '*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!': }
+    $service_enable_real = $enable_cron
+  } else {
+    $service_enable_real = $service_enable
+  }
+
+  if $ensure_state != undef {
+    notify { '*** DEPRECATION WARNING***: $ensure_state was renamed to $service_ensure. Please update your configuration. Support for $ensure_state will be removed in the near future!': }
+    $service_ensure_real = $ensure_state
+  } else {
+    $service_ensure_real = $service_ensure
+  }
 
   case $::osfamily {
     'Debian': {
@@ -73,21 +90,21 @@ class cron (
   }
 
   # Validation
-  validate_re($ensure_state, '^(running)|(stopped)$', "cron::ensure_state is <${ensure_state}> and must be running or stopped")
+  validate_re($service_ensure_real, '^(running)|(stopped)$', "cron::service_ensure is <${service_ensure_real}> and must be running or stopped")
   validate_re($package_ensure, '^(present)|(installed)|(absent)$', "cron::package_ensure is <${package_ensure}> and must be absent, present or installed")
   validate_re($cron_allow, '^(absent|file|present)$', "cron::cron_allow is <${cron_allow}> and must be absent, file or present")
   validate_re($cron_deny, '^(absent|file|present)$', "cron::cron_deny is <${cron_deny}> and must be absent, file or present")
 
-  case type3x($enable_cron) {
+  case type3x($service_enable_real) {
     'string': {
-      validate_re($enable_cron, '^(true|false)$', "cron::enable_cron is <${enable_cron}> and must be true or false.")
-      $enable_cron_real = str2bool($enable_cron)
+      validate_re($service_enable_real, '^(true|false)$', "cron::service_enable is <${service_enable_real}> and must be true or false.")
+      $service_enable_bool = str2bool($service_enable_real)
     }
     'boolean': {
-      $enable_cron_real = $enable_cron
+      $service_enable_bool = $service_enable_real
     }
     default: {
-      fail('cron::enable_cron is <${enable_cron}> and must be true or false.')
+      fail("cron::service_enable is <${service_enable_real}> and must be true or false.")
     }
   }
   if $cron_allow_users != undef {
@@ -216,8 +233,8 @@ class cron (
   }
 
   service { 'cron':
-    ensure    => $ensure_state,
-    enable    => $enable_cron_real,
+    ensure    => $service_ensure_real,
+    enable    => $service_enable_bool,
     name      => $service_name_real,
     require   => File['crontab'],
     subscribe => File['crontab'],
