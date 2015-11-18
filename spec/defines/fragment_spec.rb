@@ -20,13 +20,13 @@ describe 'cron::fragment' do
   end
 
   context 'with optional parameters set' do
-    context 'with cron_content set to <0 0 2 4 2 root command>' do
-      let(:params) { { :cron_content => '0 0 2 4 2 root command' } }
+    context 'with content set to <0 0 2 4 2 root command>' do
+      let(:params) { { :content => '0 0 2 4 2 root command' } }
       it { should contain_file('/etc/cron.daily/example').with_content('0 0 2 4 2 root command') }
     end
 
-    context 'with ensure_cron set to <present>' do
-      let(:params) { { :ensure_cron => 'present' } }
+    context 'with ensure set to <present>' do
+      let(:params) { { :ensure => 'present' } }
       it { should contain_file('/etc/cron.daily/example').with_ensure('present') }
     end
 
@@ -55,7 +55,7 @@ describe 'cron::fragment' do
 
     validations = {
       'regex_file_ensure' => {
-        :name    => ['ensure_cron'],
+        :name    => ['ensure'],
         :valid   => ['absent','file','present'],
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be absent, file or present',
@@ -64,10 +64,10 @@ describe 'cron::fragment' do
         :name    => ['type'],
         :valid   => ['d','daily','monthly','weekly','yearly'],
         :invalid => ['biweekly','hourly',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'Valid values are d, daily, weekly, monthly, yearly',
+        :message => 'must be d, daily, monthly, weekly or yearly',
       },
       'string' => {
-        :name    => ['cron_content'],
+        :name    => ['content'],
         :valid   => ['valid'],
         :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
         :message => 'must be a string',

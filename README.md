@@ -277,9 +277,9 @@ cron::crontab_tasks:
 
 ### Parameters
 
-ensure_cron
------------
-The state of the cron job. Valid values are 'present' and 'absent'.
+ensure
+------
+String for the ensure parameter of the cron fragment file. Valid values are 'absent', 'file' and 'present'.
 
 - *Default*: 'absent'
 
@@ -290,8 +290,8 @@ values are 'd', 'daily', 'weekly', 'monthly' and 'yearly'.
 
 - *Default*: 'daily'
 
-cron_content
-------------
+content
+-------
 String to represent contents of cron job.
 
 - *Default*: ''

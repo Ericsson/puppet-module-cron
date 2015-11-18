@@ -3,15 +3,15 @@
 # Manage cron jobs in separate files
 #
 define cron::fragment (
-  $ensure_cron  = 'absent',
+  $ensure       = 'absent',
+  $content      = '',
   $type         = 'daily',
-  $cron_content = '',
 ) {
 
   include cron
 
-  validate_re($ensure_cron, '^(absent|file|present)$', "cron::fragment::ensure_cron is ${cron::fragment::cron_deny} and must be absent, file or present")
-  if is_string($cron_content) == false { fail('cron::fragment::cron_content must be a string') }
+  validate_re($ensure, '^(absent|file|present)$', "cron::fragment::ensure is ${ensure} and must be absent, file or present")
+  if is_string($content) == false { fail('cron::fragment::content must be a string') }
 
   case $type {
     'd': {
@@ -21,13 +21,13 @@ define cron::fragment (
       $cron_mode = '0755'
     }
     default: {
-      fail('Valid values are d, daily, weekly, monthly, yearly')
+      fail("cron::fragment::type is ${type} and must be d, daily, monthly, weekly or yearly")
     }
   }
 
   file { "/etc/cron.${type}/${name}":
-    ensure  => $ensure_cron,
-    content => $cron_content,
+    ensure  => $ensure,
+    content => $content,
     force   => true,
     owner   => 'root',
     group   => 'root',
