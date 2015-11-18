@@ -25,9 +25,24 @@ describe 'cron::fragment' do
       it { should contain_file('/etc/cron.daily/example').with_content('0 0 2 4 2 root command') }
     end
 
-    context 'with ensure set to <present>' do
-      let(:params) { { :ensure => 'present' } }
-      it { should contain_file('/etc/cron.daily/example').with_ensure('present') }
+    context 'when ensure, owner, group and mode are set' do
+      let (:params) do
+        {
+          :ensure => 'present',
+          :owner  => 'operator',
+          :group  => 'operator',
+          :mode   => '0242',
+        }
+      end
+
+      it {
+        should contain_file('/etc/cron.daily/example').with({
+          'ensure'  => 'present',
+          'owner'   => 'operator',
+          'group'   => 'operator',
+          'mode'    => '0242',
+        })
+      }
     end
 
     ['d','daily','monthly','weekly','yearly'].each do |interval|
@@ -76,6 +91,12 @@ describe 'cron::fragment' do
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be absent, file or present',
       },
+      'regex_file_mode' => {
+        :name    => ['mode'],
+        :valid   => ['0755','0644','0242'],
+        :invalid => ['invalid','755',0755,'0980',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be a valid four digit mode in octal notation',
+      },
       'regex_type' => {
         :name    => ['type'],
         :valid   => ['d','daily','monthly','weekly','yearly'],
@@ -83,7 +104,7 @@ describe 'cron::fragment' do
         :message => 'must be d, daily, monthly, weekly or yearly',
       },
       'string' => {
-        :name    => ['content'],
+        :name    => ['content','owner','group'],
         :valid   => ['valid'],
         :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
         :message => 'must be a string',
