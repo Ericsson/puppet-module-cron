@@ -5,6 +5,7 @@
 define cron::fragment (
   $ensure       = 'absent',
   $content      = '',
+  $mode         = 'USE_DEFAULTS',
   $type         = 'daily',
   # deprecated
   $ensure_cron  = undef,
@@ -25,22 +26,28 @@ define cron::fragment (
     $content_real = $content
   }
 
+  if $mode == 'USE_DEFAULTS' {
+    case $type {
+      'd': {
+        $mode_real = '0644'
+      }
+      'daily','weekly','monthly','yearly': {
+        $mode_real = '0755'
+      }
+      default: {
+        fail("cron::fragment::type is ${type} and must be d, daily, monthly, weekly or yearly")
+      }
+    }
+  } else {
+    $mode_real = $mode
+  }
+
   include cron
 
   validate_re($ensure_real, '^(absent|file|present)$', "cron::fragment::ensure is ${ensure} and must be absent, file or present")
   if is_string($content_real) == false { fail('cron::fragment::content must be a string') }
-
-  case $type {
-    'd': {
-      $cron_mode = '0644'
-    }
-    'daily','weekly','monthly','yearly': {
-      $cron_mode = '0755'
-    }
-    default: {
-      fail("cron::fragment::type is ${type} and must be d, daily, monthly, weekly or yearly")
-    }
-  }
+  validate_re($mode_real, '^[0-7]{4}$',
+    "cron::fragment::mode is <${mode_real}> and must be a valid four digit mode in octal notation.")
 
   file { "/etc/cron.${type}/${name}":
     ensure  => $ensure_real,
@@ -48,7 +55,7 @@ define cron::fragment (
     force   => true,
     owner   => 'root',
     group   => 'root',
-    mode    => $cron_mode,
+    mode    => $mode_real,
     require => File[crontab],
   }
 }

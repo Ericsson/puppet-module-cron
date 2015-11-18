@@ -42,6 +42,12 @@ describe 'cron::fragment' do
         it { should contain_file("/etc/cron.#{interval}/example").with_mode(filemode) }
       end
     end
+
+    context 'with mode set to <0242>' do
+      let(:params) { { :mode => '0242' } }
+      it { should contain_file('/etc/cron.daily/example').with_mode('0242') }
+    end
+
   end
 
   ['absent','file','present'].each do |value|
@@ -75,6 +81,12 @@ describe 'cron::fragment' do
         :valid   => ['absent','file','present'],
         :invalid => ['invalid','directory','link',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
         :message => 'must be absent, file or present',
+      },
+      'regex_file_mode' => {
+        :name    => ['mode'],
+        :valid   => ['0755','0644','0242'],
+        :invalid => ['invalid','755',0755,'0980',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be a valid four digit mode in octal notation',
       },
       'regex_type' => {
         :name    => ['type'],
