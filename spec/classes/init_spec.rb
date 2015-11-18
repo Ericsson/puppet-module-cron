@@ -338,6 +338,26 @@ describe 'cron' do
     end
   end
 
+  [true,false,'true','false'].each do |value|
+    describe "with deprecated parameter enable_cron set to #{value} (as #{value.class})" do
+      let (:facts) { { :osfamily => 'RedHat'} }
+      let (:params) { { :enable_cron => value} }
+
+      it { should contain_notify('*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!') }
+      it { should contain_service('cron').with_enable(value) }
+    end
+  end
+
+  ['running','stopped'].each do |value|
+    describe "with deprecated parameter ensure_state set to #{value}" do
+      let (:facts) { { :osfamily => 'RedHat'} }
+      let (:params) { { :ensure_state => value} }
+
+      it { should contain_notify('*** DEPRECATION WARNING***: $ensure_state was renamed to $service_ensure. Please update your configuration. Support for $ensure_state will be removed in the near future!') }
+      it { should contain_service('cron').with_ensure(value) }
+    end
+  end
+
   describe 'variable type and content validations' do
     # set needed custom facts and variables
     let(:facts) { {
