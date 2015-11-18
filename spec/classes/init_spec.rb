@@ -286,7 +286,7 @@ describe 'cron' do
     end
 
     context 'when cron_files is set to a valid value that will create two resources' do
-      let (:params) { { :cron_files => {'spec' => {'cron_content'=>'/bin/true'},'test' => {'cron_content'=>'/bin/true'} } } }
+      let (:params) { { :cron_files => {'spec' => {'content'=>'/bin/true'},'test' => {'content'=>'/bin/true'} } } }
       it { should have_cron__fragment_resource_count(2) }
       it { should contain_cron__fragment('spec') }
       it { should contain_cron__fragment('test') }

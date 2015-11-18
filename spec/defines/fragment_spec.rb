@@ -44,6 +44,22 @@ describe 'cron::fragment' do
     end
   end
 
+  ['absent','file','present'].each do |value|
+    describe "with deprecated parameter ensure_cron set to #{value} (as #{value.class})" do
+      let (:params) { { :ensure_cron => value} }
+
+      it { should contain_notify('*** DEPRECATION WARNING***: $cron::fragment::ensure_cron was renamed to $ensure. Please update your configuration. Support for $ensure_cron will be removed in the near future!') }
+      it { should contain_file('/etc/cron.daily/example').with_ensure(value) }
+    end
+  end
+
+  describe "with deprecated parameter cron_content set to <0 0 2 4 2 root deprecated>" do
+    let (:params) { { :cron_content => '0 0 2 4 2 root deprecated'} }
+
+    it { should contain_notify('*** DEPRECATION WARNING***: $cron::fragment::cron_content was renamed to $content. Please update your configuration. Support for $cron_content will be removed in the near future!') }
+    it { should contain_file('/etc/cron.daily/example').with_content('0 0 2 4 2 root deprecated') }
+  end
+
   describe 'variable type and content validations' do
     # set needed custom facts and variables
     let(:facts) { {
