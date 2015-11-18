@@ -25,9 +25,24 @@ describe 'cron::fragment' do
       it { should contain_file('/etc/cron.daily/example').with_content('0 0 2 4 2 root command') }
     end
 
-    context 'with ensure set to <present>' do
-      let(:params) { { :ensure => 'present' } }
-      it { should contain_file('/etc/cron.daily/example').with_ensure('present') }
+    context 'when ensure, owner, group and mode are set' do
+      let (:params) do
+        {
+          :ensure => 'present',
+          :owner  => 'operator',
+          :group  => 'operator',
+          :mode   => '0242',
+        }
+      end
+
+      it {
+        should contain_file('/etc/cron.daily/example').with({
+          'ensure'  => 'present',
+          'owner'   => 'operator',
+          'group'   => 'operator',
+          'mode'    => '0242',
+        })
+      }
     end
 
     ['d','daily','monthly','weekly','yearly'].each do |interval|
@@ -42,12 +57,6 @@ describe 'cron::fragment' do
         it { should contain_file("/etc/cron.#{interval}/example").with_mode(filemode) }
       end
     end
-
-    context 'with mode set to <0242>' do
-      let(:params) { { :mode => '0242' } }
-      it { should contain_file('/etc/cron.daily/example').with_mode('0242') }
-    end
-
   end
 
   ['absent','file','present'].each do |value|
@@ -95,7 +104,7 @@ describe 'cron::fragment' do
         :message => 'must be d, daily, monthly, weekly or yearly',
       },
       'string' => {
-        :name    => ['content'],
+        :name    => ['content','owner','group'],
         :valid   => ['valid'],
         :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
         :message => 'must be a string',

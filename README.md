@@ -283,15 +283,34 @@ String for the ensure parameter of the cron fragment file. Valid values are 'abs
 
 - *Default*: 'absent'
 
+content (string)
+----------------
+String to represent contents of cron job.
+
+- *Default*: ''
+
+owner (string)
+--------------
+Name of the owner of the fragment file.
+
+- *Default*: 'root'
+
+group (string)
+--------------
+Name of the group of the fragment file.
+
+- *Default*: 'root'
+
+mode (string)
+-------------
+Filemode of the fragment file. Must use the four-digit octal notation. RegEx: /^[0-7]{4}$/
+By default it will depend on the used type parameter (see below). If type is set to 'd' it will set mode to '0644', in all other cases it will set mode to '0755'.
+
+- *Default*: 'USE_DEFAULTS'
+
 type
 ----
 The type of cron job. This generally refers to "/etc/cron.${type}/". Valid
 values are 'd', 'daily', 'weekly', 'monthly' and 'yearly'.
 
 - *Default*: 'daily'
-
-content
--------
-String to represent contents of cron job.
-
-- *Default*: ''

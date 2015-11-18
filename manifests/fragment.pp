@@ -5,6 +5,8 @@
 define cron::fragment (
   $ensure       = 'absent',
   $content      = '',
+  $owner        = 'root',
+  $group        = 'root',
   $mode         = 'USE_DEFAULTS',
   $type         = 'daily',
   # deprecated
@@ -46,6 +48,8 @@ define cron::fragment (
 
   validate_re($ensure_real, '^(absent|file|present)$', "cron::fragment::ensure is ${ensure} and must be absent, file or present")
   if is_string($content_real) == false { fail('cron::fragment::content must be a string') }
+  if is_string($owner) == false { fail('cron::fragment::owner must be a string') }
+  if is_string($group) == false { fail('cron::fragment::group must be a string') }
   validate_re($mode_real, '^[0-7]{4}$',
     "cron::fragment::mode is <${mode_real}> and must be a valid four digit mode in octal notation.")
 
@@ -53,8 +57,8 @@ define cron::fragment (
     ensure  => $ensure_real,
     content => $content_real,
     force   => true,
-    owner   => 'root',
-    group   => 'root',
+    owner   => $owner,
+    group   => $group,
     mode    => $mode_real,
     require => File[crontab],
   }
