@@ -46,9 +46,9 @@ String for the ensure parameter for the cron package. Valid values are 'installe
 
 - *Default*: 'installed'
 
-package_name
-------------
-Name of the cron package. Specify this to change the platform's default.
+package_name (string or array)
+------------------------------
+Name of the cron package(s). Specify this to change the platform's default.
 
 - *Default*: 'USE_DEFAULTS'
 

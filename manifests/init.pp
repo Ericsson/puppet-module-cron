@@ -78,9 +78,19 @@ class cron (
   }
 
   if $package_name == 'USE_DEFAULTS' {
-    $package_name_real = $package_name_default
+    $package_name_array = $package_name_default
   } else {
-    $package_name_real = $package_name
+    case type3x($package_name) {
+      'array': {
+        $package_name_array = $package_name
+      }
+      'string': {
+        $package_name_array = any2array($package_name)
+      }
+      default: {
+        fail('cron::package_name is not a string nor an array.')
+      }
+    }
   }
 
   if $service_name == 'USE_DEFAULTS' {
@@ -160,7 +170,6 @@ class cron (
     group   => $cron_allow_group,
     mode    => $cron_allow_mode,
     content => template('cron/cron_allow.erb'),
-    require => Package[$package_name_real],
   }
 
   file { 'cron_deny':
@@ -170,11 +179,20 @@ class cron (
     group   => $cron_deny_group,
     mode    => $cron_deny_mode,
     content => template('cron/cron_deny.erb'),
-    require => Package[$package_name_real],
   }
 
-  package { $package_name_real:
+  package { $package_name_array:
     ensure => $package_ensure,
+    before => [
+      File[cron_allow],
+      File[cron_deny],
+      File[crontab],
+      File[cron_d],
+      File[cron_hourly],
+      File[cron_daily],
+      File[cron_weekly],
+      File[cron_monthly],
+    ]
   }
 
   file { 'crontab':
@@ -184,52 +202,46 @@ class cron (
     group   => $crontab_group,
     mode    => $crontab_mode,
     content => template('cron/crontab.erb'),
-    require => Package[$package_name_real],
   }
 
   file { 'cron_d':
-    ensure  => directory,
-    path    => $cron_d_path,
-    owner   => $cron_dir_owner,
-    group   => $cron_dir_group,
-    mode    => $cron_dir_mode,
-    require => Package[$package_name_real],
+    ensure => directory,
+    path   => $cron_d_path,
+    owner  => $cron_dir_owner,
+    group  => $cron_dir_group,
+    mode   => $cron_dir_mode,
   }
 
   file { 'cron_hourly':
-    ensure  => directory,
-    path    => $cron_hourly_path,
-    owner   => $cron_dir_owner,
-    group   => $cron_dir_group,
-    mode    => $cron_dir_mode,
-    require => Package[$package_name_real],
+    ensure => directory,
+    path   => $cron_hourly_path,
+    owner  => $cron_dir_owner,
+    group  => $cron_dir_group,
+    mode   => $cron_dir_mode,
   }
 
   file { 'cron_daily':
-    ensure  => directory,
-    path    => $cron_daily_path,
-    owner   => $cron_dir_owner,
-    group   => $cron_dir_group,
-    mode    => $cron_dir_mode,
-    require => Package[$package_name_real],
+    ensure => directory,
+    path   => $cron_daily_path,
+    owner  => $cron_dir_owner,
+    group  => $cron_dir_group,
+    mode   => $cron_dir_mode,
   }
 
   file { 'cron_weekly':
-    ensure  => directory,
-    path    => $cron_weekly_path,
-    owner   => $cron_dir_owner,
-    group   => $cron_dir_group,
-    mode    => $cron_dir_mode,
-    require => Package[$package_name_real],
+    ensure => directory,
+    path   => $cron_weekly_path,
+    owner  => $cron_dir_owner,
+    group  => $cron_dir_group,
+    mode   => $cron_dir_mode,
   }
 
   file { 'cron_monthly':
-    ensure  => directory,
-    path    => $cron_monthly_path,
-    owner   => $cron_dir_owner,
-    group   => $cron_dir_group,
-    mode    => $cron_dir_mode,
-    require => Package[$package_name_real],
+    ensure => directory,
+    path   => $cron_monthly_path,
+    owner  => $cron_dir_owner,
+    group  => $cron_dir_group,
+    mode   => $cron_dir_mode,
   }
 
   service { 'cron':
