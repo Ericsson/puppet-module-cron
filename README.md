@@ -6,6 +6,7 @@ Manage the cron configuration files.
 - /etc/cron.allow
 - /etc/cron.deny
 - /etc/cron.d/
+- /etc/cron.hourly
 - /etc/cron.daily
 - /etc/cron.weekly
 - /etc/cron.monthly
@@ -187,7 +188,7 @@ Filemode of the cron.d directories cron.d, cron.hourly, cron.daily, cron.weekly 
 
 cron_files (hash)
 -----------------
-Hash of files managed in cron.daily, cron.weekly, cron.monthly and cron.yearly.
+Hash of files managed in cron.hourly, cron.daily, cron.weekly, cron.monthly and cron.yearly.
 See define cron::fragment for hash structure and examples for examples.
 
 - *Default*: undef
@@ -328,6 +329,6 @@ By default it will depend on the used type parameter (see below). If type is set
 type (string)
 -------------
 The type of cron job. This generally refers to "/etc/cron.${type}/". Valid
-values are 'd', 'daily', 'weekly', 'monthly' and 'yearly'.
+values are 'd', 'hourly, 'daily', 'weekly', 'monthly' and 'yearly'.
 
 - *Default*: 'daily'

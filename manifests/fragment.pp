@@ -33,11 +33,11 @@ define cron::fragment (
       'd': {
         $mode_real = '0644'
       }
-      'daily','weekly','monthly','yearly': {
+      'hourly','daily','weekly','monthly','yearly': {
         $mode_real = '0755'
       }
       default: {
-        fail("cron::fragment::type is ${type} and must be d, daily, monthly, weekly or yearly")
+        fail("cron::fragment::type is ${type} and must be d, hourly, daily, monthly, weekly or yearly")
       }
     }
   } else {

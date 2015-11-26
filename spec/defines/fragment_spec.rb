@@ -45,7 +45,7 @@ describe 'cron::fragment' do
       }
     end
 
-    ['d','daily','monthly','weekly','yearly'].each do |interval|
+    ['d','hourly','daily','monthly','weekly','yearly'].each do |interval|
       context "when type is set to <#{interval}>" do
         let (:params) { { :type => "#{interval}"} }
 
@@ -99,9 +99,9 @@ describe 'cron::fragment' do
       },
       'regex_type' => {
         :name    => ['type'],
-        :valid   => ['d','daily','monthly','weekly','yearly'],
-        :invalid => ['biweekly','hourly',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
-        :message => 'must be d, daily, monthly, weekly or yearly',
+        :valid   => ['d','hourly','daily','monthly','weekly','yearly'],
+        :invalid => ['biweekly',['array'],a={'ha'=>'sh'},3,2.42,true,false,nil],
+        :message => 'must be d, hourly, daily, monthly, weekly or yearly',
       },
       'string' => {
         :name    => ['content','owner','group'],
