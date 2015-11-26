@@ -257,14 +257,12 @@ cron::crontab_vars:
 <pre>
 cron::cron_files:
      'daily_task':
-       ensure_cron: 'present'
-       type: "daily"
-       cron_content: |-
+       ensure: 'present'
+       type: 'daily'
+       content: |
             #!/bin/bash
             # This File is managed by puppet
-            script
-            .
-            EOF
+            command
 </pre>
 
 **Manage /etc/cron.allow**
