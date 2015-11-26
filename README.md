@@ -39,8 +39,8 @@ cause errors. Please see the Hiera example below.
 A value of `'undef'` will use the defaults specified by the module.
 
 
-package_ensure
---------------
+package_ensure (string)
+-----------------------
 String for the ensure parameter for the cron package. Valid values are 'installed', 'present' and 'absent'.
 
 - *Default*: 'installed'
@@ -51,46 +51,46 @@ Name of the cron package. Specify this to change the platform's default.
 
 - *Default*: 'USE_DEFAULTS'
 
-crontab_path
-------------
+crontab_path (string)
+---------------------
 String for path to system wide crontab.
 
 - *Default*: '/etc/crontab'
 
 crontab_owner (string)
--------------------------
+----------------------
 Name of the owner of the crontab file.
 
 - *Default*: 'root'
 
 crontab_group (string)
--------------------------
+----------------------
 Name of the group of the crontab file.
 
 - *Default*: 'root'
 
 crontab_mode (string)
-------------------------
+---------------------
 Filemode of the  crontab file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
-cron_allow
-----------
+cron_allow (string)
+-------------------
 If the file cron.allow exists, only users listed in it are allowed to use cron,
 and the cron.deny file is ignored. Valid values are 'present' and 'absent'.
 
 - *Default*: 'absent'
 
-cron_deny
----------
+cron_deny (string)
+------------------
 If cron.allow does not exist, users listed in cron.deny are not allowed to use
 cron. Valid values are 'present' and 'absent'.
 
 - *Default*: 'present'
 
-cron_allow_path
----------------
+cron_allow_path (string)
+------------------------
 Path to cron.allow.
 
 - *Default*: '/etc/cron.allow'
@@ -110,6 +110,30 @@ Name of the group of the cron_allow file.
 cron_allow_mode (string)
 ------------------------
 Filemode of the  cron_allow file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+
+- *Default*: '0644'
+
+cron_deny_path (string)
+-----------------------
+Path to cron.deny.
+
+- *Default*: '/etc/cron.deny'
+
+cron_deny_owner (string)
+------------------------
+Name of the owner of the cron_deny file.
+
+- *Default*: 'root'
+
+cron_deny_group (string)
+------------------------
+Name of the group of the cron_deny file.
+
+- *Default*: 'root'
+
+cron_deny_mode (string)
+-----------------------
+Filemode of the  cron_deny file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
@@ -156,61 +180,56 @@ Name of the group of the cron.d directories cron.d, cron.hourly, cron.daily, cro
 - *Default*: 'root'
 
 cron_dir_mode (string)
---------..------------
+----------------------
 Filemode of the cron.d directories cron.d, cron.hourly, cron.daily, cron.weekly and cron.monthly. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0755'
 
-cron_deny_path
---------------
-Path to cron.deny.
+cron_files (hash)
+-----------------
+Hash of files managed in cron.daily, cron.weekly, cron.monthly and cron.yearly.
+See define cron::fragment for hash structure and examples for examples.
 
-- *Default*: '/etc/cron.deny'
+- *Default*: undef
 
-cron_deny_owner (string)
+cron_allow_users (array)
 ------------------------
-Name of the owner of the cron_deny file.
+Array of all users to be included in cron.allow.
 
-- *Default*: 'root'
+- *Default*: undef
 
-cron_deny_group (string)
-------------------------
-Name of the group of the cron_deny file.
-
-- *Default*: 'root'
-
-cron_deny_mode (string)
+cron_deny_users (array)
 -----------------------
-Filemode of the cron_deny file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+Array of all users to be included in cron.deny.
 
-- *Default*: '0644'
+- *Default*: undef
 
-crontab_vars
-------------
+crontab_vars (hash)
+-------------------
 Hash that defines the crontab variables SHELL, PATH, MAILTO, HOME. if this variable is undef the module will use the values defined in crontab template which are SHELL=/bin/bash, PATH=/sbin:/bin:/usr/sbin:/usr/bin, MAILTO=root, HOME=/
 
 - *Default*: undef
 
-crontab_tasks
--------------
+crontab_tasks (hash)
+--------------------
 Hash for crontab tasks.
 
 - *Default*: undef
 
-service_enable
---------------
+service_enable (bool)
+---------------------
 Boolean to enable the cron service.
 
 - *Default*: true
 
-service_ensure
---------------
+service_ensure (string)
+-----------------------
 String for the ensure parameter for the cron service. Valid values are 'running' and 'stopped'.
 
 - *Default*: 'running'
 
-service_name
-------------
+service_name (string)
+---------------------
 Name of the cron service. Specify this to change the platform's default.
 
 - *Default*: 'USE_DEFAULTS'
@@ -277,8 +296,8 @@ cron::crontab_tasks:
 
 ### Parameters
 
-ensure
-------
+ensure (string)
+---------------
 String for the ensure parameter of the cron fragment file. Valid values are 'absent', 'file' and 'present'.
 
 - *Default*: 'absent'
@@ -308,8 +327,8 @@ By default it will depend on the used type parameter (see below). If type is set
 
 - *Default*: 'USE_DEFAULTS'
 
-type
-----
+type (string)
+-------------
 The type of cron job. This generally refers to "/etc/cron.${type}/". Valid
 values are 'd', 'daily', 'weekly', 'monthly' and 'yearly'.
 
