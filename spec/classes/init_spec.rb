@@ -38,6 +38,16 @@ describe 'cron' do
     it {
       should contain_package('crontabs').with({
         'ensure' => 'installed',
+        'before' => [
+          'File[cron_allow]',
+          'File[cron_deny]',
+          'File[crontab]',
+          'File[cron_d]',
+          'File[cron_hourly]',
+          'File[cron_daily]',
+          'File[cron_weekly]',
+          'File[cron_monthly]',
+        ],
       })
     }
     it {
@@ -47,7 +57,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0644',
-        'require' => 'Package[crontabs]',
         'content' => "# This file is being maintained by Puppet.\n# DO NOT EDIT\n",
       })
     }
@@ -58,7 +67,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0644',
-        'require' => 'Package[crontabs]',
         'content' => "# This file is being maintained by Puppet.\n# DO NOT EDIT\n",
       })
     }
@@ -69,7 +77,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0644',
-        'require' => 'Package[crontabs]',
         'content' => File.read(fixtures('default_crontab')),
       })
     }
@@ -80,7 +87,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0755',
-        'require' => 'Package[crontabs]',
       })
     }
     it {
@@ -90,7 +96,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0755',
-        'require' => 'Package[crontabs]',
       })
     }
     it {
@@ -100,7 +105,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0755',
-        'require' => 'Package[crontabs]',
       })
     }
     it {
@@ -110,7 +114,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0755',
-        'require' => 'Package[crontabs]',
       })
     }
     it {
@@ -120,7 +123,6 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0755',
-        'require' => 'Package[crontabs]',
       })
     }
     it {
@@ -146,14 +148,6 @@ describe 'cron' do
       end
 
       it { should contain_package(v[:package_name]) }
-      it { should contain_file('cron_allow').with_require("Package[#{v[:package_name]}]") }
-      it { should contain_file('cron_deny').with_require("Package[#{v[:package_name]}]") }
-      it { should contain_file('crontab').with_require("Package[#{v[:package_name]}]") }
-      it { should contain_file('cron_d').with_require("Package[#{v[:package_name]}]") }
-      it { should contain_file('cron_hourly').with_require("Package[#{v[:package_name]}]") }
-      it { should contain_file('cron_daily').with_require("Package[#{v[:package_name]}]") }
-      it { should contain_file('cron_weekly').with_require("Package[#{v[:package_name]}]") }
-      it { should contain_file('cron_monthly').with_require("Package[#{v[:package_name]}]") }
       it { should contain_service('cron').with_name("#{v[:service_name]}") }
     end
   end
@@ -322,10 +316,39 @@ describe 'cron' do
 
     context 'when package_name is set to <cron242>' do
       let (:params) { { :package_name => 'cron242' } }
-      it { should contain_package('cron242') }
-      ['cron_allow','cron_deny','crontab','cron_d','cron_hourly','cron_daily','cron_weekly','cron_monthly'].each do |filename|
-        it { should contain_file(filename).with_require('Package[cron242]') }
-      end
+      it { should contain_package('cron242').with_before([
+        'File[cron_allow]',
+        'File[cron_deny]',
+        'File[crontab]',
+        'File[cron_d]',
+        'File[cron_hourly]',
+        'File[cron_daily]',
+        'File[cron_weekly]',
+        'File[cron_monthly]',
+      ] ) }
+    end
+    context 'when package_name is set to <[\'cron242\',\'cronhelper\']>' do
+      let (:params) { { :package_name => ['cron242','cronhelper'] } }
+      it { should contain_package('cron242').with_before([
+        'File[cron_allow]',
+        'File[cron_deny]',
+        'File[crontab]',
+        'File[cron_d]',
+        'File[cron_hourly]',
+        'File[cron_daily]',
+        'File[cron_weekly]',
+        'File[cron_monthly]',
+      ] ) }
+      it { should contain_package('cronhelper').with_before([
+        'File[cron_allow]',
+        'File[cron_deny]',
+        'File[crontab]',
+        'File[cron_d]',
+        'File[cron_hourly]',
+        'File[cron_daily]',
+        'File[cron_weekly]',
+        'File[cron_monthly]',
+      ] ) }
     end
   end
 
@@ -379,6 +402,12 @@ describe 'cron' do
         :valid   => [['array'],['val','id']],
         :invalid => ['string',inv={'al'=>'id'},3,2.42,true,false,nil],
         :message => 'is not an Array',
+      },
+      'array/string' => {
+        :name    => ['package_name'],
+        :valid   => [['array'],['val','id'],'string'],
+        :invalid => [inv={'al'=>'id'},3,2.42,true,false],
+        :message => 'is not a string nor an array',
       },
       'hash' => {
         :name    => ['cron_files'],
