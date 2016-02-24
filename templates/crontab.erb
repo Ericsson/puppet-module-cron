@@ -30,7 +30,7 @@ HOME=/
 <% end -%>
 <% end -%>
 <% end -%>
-<% if (( @osfamily == 'RedHat' ) and ( @operatingsystemrelease =~ /^5/ )) or (( @osfamily == 'Suse' ) and ( @operatingsystemrelease =~ /^10/ )) -%>
+<% if @osfamily == 'RedHat' and @operatingsystemrelease =~ /^5/ -%>
 # run-parts
 <% if @cron_hourly_path != nil -%>
 01 * * * * root run-parts <%= @cron_hourly_path %>
@@ -44,7 +44,7 @@ HOME=/
 <% if @cron_monthly_path != nil -%>
 42 4 1 * * root run-parts <%= @cron_monthly_path %>
 <% end -%>
-<% elsif @osfamily == 'Suse' and (( @operatingsystemrelease =~ /^11/ ) or ( @operatingsystemrelease =~ /^12/ )) -%>
+<% elsif @osfamily == 'Suse' -%>
 #
 # check scripts in cron.hourly, cron.daily, cron.weekly, and cron.monthly
 #
