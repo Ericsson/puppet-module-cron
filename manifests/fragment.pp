@@ -4,7 +4,7 @@
 #
 define cron::fragment (
   $ensure       = 'absent',
-  $content      = '',
+  $content      = undef,
   $owner        = 'root',
   $group        = 'root',
   $mode         = 'USE_DEFAULTS',
@@ -44,7 +44,7 @@ define cron::fragment (
     $mode_real = $mode
   }
 
-  include cron
+  include ::cron
 
   validate_re($ensure_real, '^(absent|file|present)$', "cron::fragment::ensure is ${ensure} and must be absent, file or present")
   if is_string($content_real) == false { fail('cron::fragment::content must be a string') }
