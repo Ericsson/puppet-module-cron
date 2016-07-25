@@ -86,7 +86,7 @@ describe 'cron' do
     }
     it {
       should contain_file('crontab').with({
-        'ensure'  => 'present',
+        'ensure'  => 'file',
         'path'    => '/etc/crontab',
         'owner'   => 'root',
         'group'   => 'root',

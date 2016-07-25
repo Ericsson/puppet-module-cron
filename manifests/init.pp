@@ -123,15 +123,18 @@ class cron (
   if $cron_deny_users != undef {
     validate_array($cron_deny_users)
   }
-  if $cron_files != undef {
-    validate_hash($cron_files)
-    create_resources(cron::fragment,$cron_files)
-  }
+
   if $crontab_tasks != undef {
     validate_hash($crontab_tasks)
   }
+
   if $crontab_vars != undef {
     validate_hash($crontab_vars)
+  }
+
+  if $cron_files != undef {
+    validate_hash($cron_files)
+    create_resources(cron::fragment,$cron_files)
   }
 
   validate_absolute_path($cron_allow_path)
@@ -192,11 +195,11 @@ class cron (
       File[cron_daily],
       File[cron_weekly],
       File[cron_monthly],
-    ]
+    ],
   }
 
   file { 'crontab':
-    ensure  => present,
+    ensure  => file,
     path    => $crontab_path,
     owner   => $crontab_owner,
     group   => $crontab_group,
