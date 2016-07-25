@@ -176,6 +176,34 @@ describe 'cron' do
     end
   end
 
+  describe 'with cron_hourly_path, cron_daily_path, cron_weekly_path and cron_monthly_path set on RedHat 5' do
+    let (:facts) do
+      {
+        :osfamily => 'RedHat',
+        :operatingsystemrelease => '5.5',
+      }
+    end
+    let (:params) do
+      {
+        :cron_hourly_path => '/path/to/hourly',
+        :cron_daily_path => '/path/to/daily',
+        :cron_weekly_path => '/path/to/weekly',
+        :cron_monthly_path => '/path/to/monthly',
+      }
+    end
+
+    it {
+      should contain_file('crontab').with({
+        'ensure'  => 'present',
+        'path'    => '/etc/crontab',
+        'owner'   => 'root',
+        'group'   => 'root',
+        'mode'    => '0644',
+        'content' => File.read(fixtures("custpath_crontab-RedHat-5")),
+      })
+    }
+  end
+
   describe 'with optional parameters set' do
     let (:facts) { { :osfamily => 'RedHat'} }
 
