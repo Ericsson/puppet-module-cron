@@ -13,7 +13,7 @@ describe 'cron::fragment' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0755',
-        'content' => '',
+        'content' => nil,
         'require' => 'File[crontab]',
       })
     }
