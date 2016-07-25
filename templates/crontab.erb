@@ -30,3 +30,23 @@ HOME=/
 <% end -%>
 <% end -%>
 <% end -%>
+<% if @osfamily == 'RedHat' and @operatingsystemrelease =~ /^5/ -%>
+# run-parts
+<% if @cron_hourly_path != nil -%>
+01 * * * * root run-parts <%= @cron_hourly_path %>
+<% end -%>
+<% if @cron_daily_path != nil -%>
+02 4 * * * root run-parts <%= @cron_daily_path %>
+<% end -%>
+<% if @cron_weekly_path != nil -%>
+22 4 * * 0 root run-parts <%= @cron_weekly_path %>
+<% end -%>
+<% if @cron_monthly_path != nil -%>
+42 4 1 * * root run-parts <%= @cron_monthly_path %>
+<% end -%>
+<% elsif @osfamily == 'Suse' -%>
+#
+# check scripts in cron.hourly, cron.daily, cron.weekly, and cron.monthly
+#
+-*/15 * * * *   root  test -x /usr/lib/cron/run-crons && /usr/lib/cron/run-crons >/dev/null 2>&1
+<% end -%>
