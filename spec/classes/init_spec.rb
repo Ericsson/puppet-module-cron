@@ -2,12 +2,26 @@ require 'spec_helper'
 describe 'cron' do
 
   platforms = {
+    'RedHat 5' =>
+      {
+        :osfamily     => 'RedHat',
+        :osrelease    => '5.5',
+        :package_name => 'crontabs',
+        :service_name => 'crond',
+      },
     'RedHat 6' =>
       {
         :osfamily     => 'RedHat',
         :osrelease    => '6.7',
         :package_name => 'crontabs',
         :service_name => 'crond',
+      },
+    'Suse 10' =>
+      {
+        :osfamily     => 'Suse',
+        :osrelease    => '10.4',
+        :package_name => 'cron',
+        :service_name => 'cron',
       },
     'Suse 11' =>
       {
@@ -149,7 +163,45 @@ describe 'cron' do
 
       it { should contain_package(v[:package_name]) }
       it { should contain_service('cron').with_name("#{v[:service_name]}") }
+      it {
+        should contain_file('crontab').with({
+          'ensure'  => 'file',
+          'path'    => '/etc/crontab',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          'content' => File.read(fixtures("default_crontab-#{v[:osfamily]}-#{v[:osrelease]}")),
+        })
+      }
     end
+  end
+
+  describe 'with cron_hourly_path, cron_daily_path, cron_weekly_path and cron_monthly_path set on RedHat 5' do
+    let (:facts) do
+      {
+        :osfamily => 'RedHat',
+        :operatingsystemrelease => '5.5',
+      }
+    end
+    let (:params) do
+      {
+        :cron_hourly_path => '/path/to/hourly',
+        :cron_daily_path => '/path/to/daily',
+        :cron_weekly_path => '/path/to/weekly',
+        :cron_monthly_path => '/path/to/monthly',
+      }
+    end
+
+    it {
+      should contain_file('crontab').with({
+        'ensure'  => 'file',
+        'path'    => '/etc/crontab',
+        'owner'   => 'root',
+        'group'   => 'root',
+        'mode'    => '0644',
+        'content' => File.read(fixtures("custpath_crontab-RedHat-5")),
+      })
+    }
   end
 
   describe 'with optional parameters set' do
