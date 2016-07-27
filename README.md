@@ -217,6 +217,18 @@ Hash for crontab tasks.
 
 - *Default*: undef
 
+periodic_jobs_content (array or string)
+---------------------------------------
+Log entry lines for the periodic jobs section. One entry per line. Leave it unset (undef) to use the OS vendor defaults values.
+
+- *Default*: undef
+
+periodic_jobs_manage (boolean)
+------------------------------
+Trigger to control if periodic jobs schedules should be included in /etc/crontab.
+
+- *Default*: true
+
 service_enable (bool)
 ---------------------
 Boolean to enable the cron service.
