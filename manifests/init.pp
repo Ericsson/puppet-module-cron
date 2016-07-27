@@ -3,41 +3,43 @@
 # This module manages cron
 #
 class cron (
-  $package_ensure     = 'installed',
-  $package_name       = 'USE_DEFAULTS',
-  $crontab_path       = '/etc/crontab',
-  $crontab_owner      = 'root',
-  $crontab_group      = 'root',
-  $crontab_mode       = '0644',
-  $cron_allow         = 'absent',
-  $cron_deny          = 'present',
-  $cron_allow_path    = '/etc/cron.allow',
-  $cron_allow_owner   = 'root',
-  $cron_allow_group   = 'root',
-  $cron_allow_mode    = '0644',
-  $cron_deny_path     = '/etc/cron.deny',
-  $cron_deny_owner    = 'root',
-  $cron_deny_group    = 'root',
-  $cron_deny_mode     = '0644',
-  $cron_d_path        = '/etc/cron.d',
-  $cron_hourly_path   = '/etc/cron.hourly',
-  $cron_daily_path    = '/etc/cron.daily',
-  $cron_weekly_path   = '/etc/cron.weekly',
-  $cron_monthly_path  = '/etc/cron.monthly',
-  $cron_dir_owner     = 'root',
-  $cron_dir_group     = 'root',
-  $cron_dir_mode      = '0755',
-  $cron_files         = undef,
-  $cron_allow_users   = undef,
-  $cron_deny_users    = undef,
-  $crontab_vars       = undef,
-  $crontab_tasks      = undef,
-  $service_enable     = true,
-  $service_ensure     = 'running',
-  $service_name       = 'USE_DEFAULTS',
+  $package_ensure        = 'installed',
+  $package_name          = 'USE_DEFAULTS',
+  $crontab_path          = '/etc/crontab',
+  $crontab_owner         = 'root',
+  $crontab_group         = 'root',
+  $crontab_mode          = '0644',
+  $cron_allow            = 'absent',
+  $cron_deny             = 'present',
+  $cron_allow_path       = '/etc/cron.allow',
+  $cron_allow_owner      = 'root',
+  $cron_allow_group      = 'root',
+  $cron_allow_mode       = '0644',
+  $cron_deny_path        = '/etc/cron.deny',
+  $cron_deny_owner       = 'root',
+  $cron_deny_group       = 'root',
+  $cron_deny_mode        = '0644',
+  $cron_d_path           = '/etc/cron.d',
+  $cron_hourly_path      = '/etc/cron.hourly',
+  $cron_daily_path       = '/etc/cron.daily',
+  $cron_weekly_path      = '/etc/cron.weekly',
+  $cron_monthly_path     = '/etc/cron.monthly',
+  $cron_dir_owner        = 'root',
+  $cron_dir_group        = 'root',
+  $cron_dir_mode         = '0755',
+  $cron_files            = undef,
+  $cron_allow_users      = undef,
+  $cron_deny_users       = undef,
+  $crontab_vars          = undef,
+  $crontab_tasks         = undef,
+  $periodic_jobs_content = undef,
+  $periodic_jobs_manage  = true,
+  $service_enable        = true,
+  $service_ensure        = 'running',
+  $service_name          = 'USE_DEFAULTS',
   # deprecated
-  $enable_cron        = undef,
-  $ensure_state       = undef,
+  $enable_cron           = undef,
+  $ensure_state          = undef,
 ) {
 
   if $enable_cron != undef {
@@ -58,8 +60,15 @@ class cron (
     'Debian': {
       $package_name_default = 'cron'
       $service_name_default = 'cron'
+      $periodic_jobs_content_default = []
     }
     'Suse': {
+      $periodic_jobs_content_default = [
+        '#',
+        '# check scripts in cron.hourly, cron.daily, cron.weekly, and cron.monthly',
+        '#',
+        '-*/15 * * * *   root  test -x /usr/lib/cron/run-crons && /usr/lib/cron/run-crons >/dev/null 2>&1',
+      ]
       if $::operatingsystemrelease =~ /^12\./ {
         $package_name_default = 'cronie'
         $service_name_default = 'cron'
@@ -71,6 +80,20 @@ class cron (
     'RedHat': {
       $package_name_default = 'crontabs'
       $service_name_default = 'crond'
+      case $::operatingsystemrelease {
+        /^5\./: {
+          $periodic_jobs_content_default = [
+            '# run-parts',
+            "01 * * * * root run-parts ${cron_hourly_path}",
+            "02 4 * * * root run-parts ${cron_daily_path}",
+            "22 4 * * 0 root run-parts ${cron_weekly_path}",
+            "42 4 1 * * root run-parts ${cron_monthly_path}",
+          ]
+        }
+        default: {
+          $periodic_jobs_content_default = []
+        }
+      }
     }
     default: {
       fail("cron supports osfamilies RedHat, Suse and Debian. Detected osfamily is <${::osfamily}>.")
@@ -90,6 +113,24 @@ class cron (
       default: {
         fail('cron::package_name is not a string nor an array.')
       }
+    }
+  }
+
+  case $periodic_jobs_manage {
+    true, 'true':   { $periodic_jobs_manage_bool = true } # lint:ignore:quoted_booleans
+    false, 'false': { $periodic_jobs_manage_bool = false } # lint:ignore:quoted_booleans
+    default:        { fail('cron::periodic_jobs_manage is not a boolean.') }
+  }
+
+  if $periodic_jobs_manage_bool == true {
+    $periodic_jobs_content_real = $periodic_jobs_content ? {
+      undef   => $periodic_jobs_content_default,
+      default => $periodic_jobs_content,
+    }
+    case type3x($periodic_jobs_content_real) {
+      'array':  { $periodic_jobs_content_array = $periodic_jobs_content_real }
+      'string': { $periodic_jobs_content_array = any2array($periodic_jobs_content_real) }
+      default:  { fail('cron::periodic_jobs_content is not a string nor an array.') }
     }
   }
 
