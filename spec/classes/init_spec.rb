@@ -1,5 +1,11 @@
 require 'spec_helper'
 describe 'cron' do
+  let :facts do
+    {
+      :osfamily               => 'RedHat',
+      :operatingsystemrelease => '6.7',
+    }
+  end
 
   crontab_default = <<-END.gsub(/^\s+\|/, '')
     |# This file is being maintained by Puppet.
@@ -91,8 +97,6 @@ describe 'cron' do
 
 
   describe 'with default values for parameters on valid OS' do
-    let (:facts) { { :osfamily => 'RedHat'} }
-
     it {
       should contain_package('crontabs').with({
         'ensure' => 'installed',
@@ -257,8 +261,6 @@ describe 'cron' do
   end
 
   describe 'with optional parameters set' do
-    let (:facts) { { :osfamily => 'RedHat'} }
-
     context 'when cron_allow, cron_allow_group, cron_allow_mode, cron_allow_owner and cron_allow_path are set' do
       let (:params) do
         {
@@ -513,7 +515,6 @@ describe 'cron' do
 
   [true,false,'true','false'].each do |value|
     describe "with deprecated parameter enable_cron set to #{value} (as #{value.class})" do
-      let (:facts) { { :osfamily => 'RedHat'} }
       let (:params) { { :enable_cron => value} }
 
       it { should contain_notify('*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!') }
@@ -523,7 +524,6 @@ describe 'cron' do
 
   ['running','stopped'].each do |value|
     describe "with deprecated parameter ensure_state set to #{value}" do
-      let (:facts) { { :osfamily => 'RedHat'} }
       let (:params) { { :ensure_state => value} }
 
       it { should contain_notify('*** DEPRECATION WARNING***: $ensure_state was renamed to $service_ensure. Please update your configuration. Support for $ensure_state will be removed in the near future!') }
@@ -534,7 +534,8 @@ describe 'cron' do
   describe 'variable type and content validations' do
     # set needed custom facts and variables
     let(:facts) { {
-      :osfamily => 'RedHat',
+      :osfamily               => 'RedHat',
+      :operatingsystemrelease => '6.7',
     } }
     let(:validation_params) { {
 #      :param => 'value',
