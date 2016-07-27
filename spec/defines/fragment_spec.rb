@@ -2,7 +2,12 @@ require 'spec_helper'
 describe 'cron::fragment' do
 
   let(:title) { 'example' }
-  let(:facts) { { :osfamily => 'RedHat' } }
+  let(:facts) do
+    {
+      :osfamily               => 'RedHat',
+      :operatingsystemrelease => '6.7',
+    }
+  end
 
   context 'with default values for parameters on valid OS' do
     it { should compile.with_all_deps }
@@ -77,9 +82,12 @@ describe 'cron::fragment' do
 
   describe 'variable type and content validations' do
     # set needed custom facts and variables
-    let(:facts) { {
-      :osfamily => 'RedHat',
-    } }
+    let(:facts) do
+      {
+        :osfamily => 'RedHat',
+        :operatingsystemrelease => '6.7',
+      }
+    end
     let(:validation_params) { {
 #      :param => 'value',
     } }
