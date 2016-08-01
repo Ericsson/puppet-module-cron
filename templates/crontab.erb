@@ -30,3 +30,8 @@ HOME=/
 <% end -%>
 <% end -%>
 <% end -%>
+<% if @periodic_jobs_manage_bool == true -%>
+<%   @periodic_jobs_content_array.each do |line| -%>
+<%=    line %>
+<%   end -%>
+<% end -%>

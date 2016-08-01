@@ -1,13 +1,72 @@
 require 'spec_helper'
 describe 'cron' do
+  let :facts do
+    {
+      :osfamily               => 'RedHat',
+      :operatingsystemrelease => '6.7',
+    }
+  end
+
+  crontab_default = <<-END.gsub(/^\s+\|/, '')
+    |# This file is being maintained by Puppet.
+    |# DO NOT EDIT
+    |
+    |SHELL=/bin/bash
+    |PATH=/sbin:/bin:/usr/sbin:/usr/bin
+    |MAILTO=root
+    |HOME=/
+    |# For details see man 4 crontabs
+    |
+    |# Example of job definition:
+    |# .---------------- minute (0 - 59)
+    |# |  .------------- hour (0 - 23)
+    |# |  |  .---------- day of month (1 - 31)
+    |# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+    |# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+    |# |  |  |  |  |
+    |# *  *  *  *  * user-name command to be executed
+    |
+  END
+
+  crontab_periodics_rhel5 = <<-END.gsub(/^\s+\|/, '')
+    |# run-parts
+    |01 * * * * root run-parts /etc/cron.hourly
+    |02 4 * * * root run-parts /etc/cron.daily
+    |22 4 * * 0 root run-parts /etc/cron.weekly
+    |42 4 1 * * root run-parts /etc/cron.monthly
+  END
+
+  crontab_periodics_suse = <<-END.gsub(/^\s+\|/, '')
+    |#
+    |# check scripts in cron.hourly, cron.daily, cron.weekly, and cron.monthly
+    |#
+    |-*/15 * * * *   root  test -x /usr/lib/cron/run-crons && /usr/lib/cron/run-crons >/dev/null 2>&1
+  END
 
   platforms = {
+    'RedHat 5' =>
+      {
+        :osfamily     => 'RedHat',
+        :osrelease    => '5.5',
+        :package_name => 'crontabs',
+        :service_name => 'crond',
+        :crontab      => crontab_default + crontab_periodics_rhel5,
+      },
     'RedHat 6' =>
       {
         :osfamily     => 'RedHat',
         :osrelease    => '6.7',
         :package_name => 'crontabs',
         :service_name => 'crond',
+        :crontab      => crontab_default,
+      },
+    'Suse 10' =>
+      {
+        :osfamily     => 'Suse',
+        :osrelease    => '10.4',
+        :package_name => 'cron',
+        :service_name => 'cron',
+        :crontab      => crontab_default + crontab_periodics_suse,
       },
     'Suse 11' =>
       {
@@ -15,6 +74,7 @@ describe 'cron' do
         :osrelease    => '11.3',
         :package_name => 'cron',
         :service_name => 'cron',
+        :crontab      => crontab_default + crontab_periodics_suse,
       },
     'Suse 12' =>
       {
@@ -22,6 +82,7 @@ describe 'cron' do
         :osrelease    => '12.1',
         :package_name => 'cronie',
         :service_name => 'cron',
+        :crontab      => crontab_default + crontab_periodics_suse,
       },
     'Debian 7' =>
       {
@@ -29,12 +90,13 @@ describe 'cron' do
         :osrelease    => '7.9',
         :package_name => 'cron',
         :service_name => 'cron',
+        :crontab     => crontab_default,
       },
   }
 
-  describe 'with default values for parameters on valid OS' do
-    let (:facts) { { :osfamily => 'RedHat'} }
 
+
+  describe 'with default values for parameters on valid OS' do
     it {
       should contain_package('crontabs').with({
         'ensure' => 'installed',
@@ -77,7 +139,7 @@ describe 'cron' do
         'owner'   => 'root',
         'group'   => 'root',
         'mode'    => '0644',
-        'content' => File.read(fixtures('default_crontab')),
+        'content' => crontab_default,
       })
     }
     it {
@@ -149,12 +211,56 @@ describe 'cron' do
 
       it { should contain_package(v[:package_name]) }
       it { should contain_service('cron').with_name("#{v[:service_name]}") }
+      it {
+        should contain_file('crontab').with({
+          'ensure'  => 'file',
+          'path'    => '/etc/crontab',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          'content' => v[:crontab],
+        })
+      }
     end
   end
 
-  describe 'with optional parameters set' do
-    let (:facts) { { :osfamily => 'RedHat'} }
+  describe 'with cron_hourly_path, cron_daily_path, cron_weekly_path and cron_monthly_path set on RedHat 5' do
+    let (:facts) do
+      {
+        :osfamily               => 'RedHat',
+        :operatingsystemrelease => '5.5',
+      }
+    end
+    let (:params) do
+      {
+        :cron_hourly_path  => '/path/to/hourly',
+        :cron_daily_path   => '/path/to/daily',
+        :cron_weekly_path  => '/path/to/weekly',
+        :cron_monthly_path => '/path/to/monthly',
+      }
+    end
 
+    crontab_periodics = <<-END.gsub(/^\s+\|/, '')
+      |# run-parts
+      |01 * * * * root run-parts /path/to/hourly
+      |02 4 * * * root run-parts /path/to/daily
+      |22 4 * * 0 root run-parts /path/to/weekly
+      |42 4 1 * * root run-parts /path/to/monthly
+    END
+
+    it {
+      should contain_file('crontab').with({
+        'ensure'  => 'file',
+        'path'    => '/etc/crontab',
+        'owner'   => 'root',
+        'group'   => 'root',
+        'mode'    => '0644',
+        'content' => crontab_default + crontab_periodics,
+      })
+    }
+  end
+
+  describe 'with optional parameters set' do
     context 'when cron_allow, cron_allow_group, cron_allow_mode, cron_allow_owner and cron_allow_path are set' do
       let (:params) do
         {
@@ -291,6 +397,52 @@ describe 'cron' do
       it { should contain_file('crontab').with_content(/^# spec\n0 0 2 4 2 root \/bin\/true\n1 2 3 4 5 root \/bin\/false\n# test\n5 4 3 2 1 spec \/bin\/test/) }
     end
 
+    crontab_string = <<-END.gsub(/^\s+\|/, '')
+      |multi
+      |line
+      |string
+    END
+
+    context 'when periodic_jobs_content is set to a valid value as string' do
+      let (:params) { { :periodic_jobs_content => "multi\nline\nstring" } }
+      it { should contain_file('crontab').with_content("#{crontab_default}#{crontab_string}") }
+    end
+
+    crontab_array = <<-END.gsub(/^\s+\|/, '')
+      |multi
+      |value
+      |array
+    END
+
+    context 'when periodic_jobs_content is set to a valid value as array' do
+      let (:params) { { :periodic_jobs_content => %w(multi value array) } }
+      it { should contain_file('crontab').with_content("#{crontab_default}#{crontab_array}") }
+    end
+
+    platforms.sort.each do |k,v|
+      describe "when periodic_jobs_manage is set to a valid false on #{k}" do
+        let :facts do
+          {
+            :osfamily               => v[:osfamily],
+            :operatingsystemrelease => v[:osrelease],
+          }
+        end
+        let (:params) { { :periodic_jobs_manage => false } }
+        it { should contain_file('crontab').with_content(crontab_default) }
+      end
+    end
+
+    context 'when periodic_jobs_manage is set to a valid false on RedHat 5' do
+      let (:facts) do
+        {
+          :osfamily               => 'RedHat',
+          :operatingsystemrelease => '5.5',
+        }
+      end
+      let (:params) { { :periodic_jobs_manage => false } }
+      it { should contain_file('crontab').with_content(crontab_default) }
+    end
+
     # enhancement: move the default values from template to $crontab_vars and remove the without tests below
     context 'when crontab_vars is set to a valid value' do
       let (:params) { { :crontab_vars => {'SHELL' => '/bin/sh','PATH' => '/test', 'MAILTO' => 'operator', 'HOME'=>'/test' } } }
@@ -363,7 +515,6 @@ describe 'cron' do
 
   [true,false,'true','false'].each do |value|
     describe "with deprecated parameter enable_cron set to #{value} (as #{value.class})" do
-      let (:facts) { { :osfamily => 'RedHat'} }
       let (:params) { { :enable_cron => value} }
 
       it { should contain_notify('*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!') }
@@ -373,7 +524,6 @@ describe 'cron' do
 
   ['running','stopped'].each do |value|
     describe "with deprecated parameter ensure_state set to #{value}" do
-      let (:facts) { { :osfamily => 'RedHat'} }
       let (:params) { { :ensure_state => value} }
 
       it { should contain_notify('*** DEPRECATION WARNING***: $ensure_state was renamed to $service_ensure. Please update your configuration. Support for $ensure_state will be removed in the near future!') }
@@ -384,7 +534,8 @@ describe 'cron' do
   describe 'variable type and content validations' do
     # set needed custom facts and variables
     let(:facts) { {
-      :osfamily => 'RedHat',
+      :osfamily               => 'RedHat',
+      :operatingsystemrelease => '6.7',
     } }
     let(:validation_params) { {
 #      :param => 'value',
@@ -404,10 +555,16 @@ describe 'cron' do
         :message => 'is not an Array',
       },
       'array/string' => {
-        :name    => ['package_name'],
+        :name    => ['package_name', 'periodic_jobs_content'],
         :valid   => [['array'],['val','id'],'string'],
         :invalid => [inv={'al'=>'id'},3,2.42,true,false],
         :message => 'is not a string nor an array',
+      },
+      'boolean / stringified' => {
+        :name    => %w(periodic_jobs_manage),
+        :valid   => [true, 'true', false, 'false'],
+        :invalid => ['string', %w(array), { 'ha' => 'sh' }, 3, 2.42, nil],
+        :message => '(is not a boolean|Unknown type of boolean given)',
       },
       'hash' => {
         :name    => ['cron_files'],
