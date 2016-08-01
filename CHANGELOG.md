@@ -1,3 +1,8 @@
+##2016-08-01 - Release 2.1.0
+### Summary
+Fixed periodic cron jobs not getting removed on RHEL5 and Suse anymore.
+If you want to keep the old unfixed behaviour of the module, set $periodic_jobs_manage to false.
+
 ##2015-12-08 - Release 2.0.0
 ### Summary
 ####Breaking News
