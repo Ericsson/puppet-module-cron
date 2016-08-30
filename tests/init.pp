@@ -1,1 +1,1 @@
-include cron
+include ::cron
