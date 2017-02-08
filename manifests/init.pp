@@ -116,10 +116,10 @@ class cron (
     }
   }
 
-  case $periodic_jobs_manage {
-    true, 'true':   { $periodic_jobs_manage_bool = true } # lint:ignore:quoted_booleans
-    false, 'false': { $periodic_jobs_manage_bool = false } # lint:ignore:quoted_booleans
-    default:        { fail('cron::periodic_jobs_manage is not a boolean.') }
+  if is_bool($periodic_jobs_manage) == true {
+    $periodic_jobs_manage_bool = $periodic_jobs_manage
+  } else {
+    $periodic_jobs_manage_bool = str2bool($periodic_jobs_manage)
   }
 
   if $periodic_jobs_manage_bool == true {
