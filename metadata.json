@@ -7,6 +7,35 @@
   "source": "git://github.com/Ericsson/puppet-module-cron.git",
   "project_page": "https://github.com/Ericsson/puppet-module-cron",
   "issues_url": "https://github.com/Ericsson/puppet-module-cron/issues",
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "6"
+      ]
+    },
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "5",
+        "6"
+      ]
+    },
+    {
+      "operatingsystem": "SLES",
+      "operatingsystemrelease": [
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [
+        "12.04"
+      ]
+    }
+  ],
   "description": "Manage cron",
   "dependencies": [
     {"name":"puppetlabs/stdlib","version_requirement":">= 4.6.0 < 6.0.0"}
