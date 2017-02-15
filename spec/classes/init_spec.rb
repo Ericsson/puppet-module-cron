@@ -564,7 +564,7 @@ describe 'cron' do
         :name    => %w(periodic_jobs_manage),
         :valid   => [true, 'true', false, 'false'],
         :invalid => ['string', %w(array), { 'ha' => 'sh' }, 3, 2.42, nil],
-        :message => '(is not a boolean|Unknown type of boolean given)',
+        :message => '(Unknown type of boolean given|Requires either string to work with)',
       },
       'hash' => {
         :name    => ['cron_files'],
