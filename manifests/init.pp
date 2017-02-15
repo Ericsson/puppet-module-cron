@@ -116,11 +116,7 @@ class cron (
     }
   }
 
-  if is_bool($periodic_jobs_manage) == true {
-    $periodic_jobs_manage_bool = $periodic_jobs_manage
-  } else {
-    $periodic_jobs_manage_bool = str2bool($periodic_jobs_manage)
-  }
+  $periodic_jobs_manage_bool = str2bool($periodic_jobs_manage)
 
   if $periodic_jobs_manage_bool == true {
     $periodic_jobs_content_real = $periodic_jobs_content ? {
