@@ -84,10 +84,10 @@ describe 'cron' do
         :service_name => 'cron',
         :crontab      => crontab_default + crontab_periodics_suse,
       },
-    'Debian 7' =>
+    'Ubuntu 12' =>
       {
         :osfamily     => 'Debian',
-        :osrelease    => '7.9',
+        :osrelease    => '12.04',
         :package_name => 'cron',
         :service_name => 'cron',
         :crontab     => crontab_default,
@@ -509,7 +509,7 @@ describe 'cron' do
     it 'should fail' do
       expect {
         should contain_class(subject)
-      }.to raise_error(Puppet::Error,/supports osfamilies RedHat, Suse and Debian/)
+      }.to raise_error(Puppet::Error,/supports osfamilies RedHat, Suse and Ubuntu/)
     end
   end
 
@@ -564,7 +564,7 @@ describe 'cron' do
         :name    => %w(periodic_jobs_manage),
         :valid   => [true, 'true', false, 'false'],
         :invalid => ['string', %w(array), { 'ha' => 'sh' }, 3, 2.42, nil],
-        :message => '(is not a boolean|Unknown type of boolean given)',
+        :message => '(Unknown type of boolean given|Requires either string to work with)',
       },
       'hash' => {
         :name    => ['cron_files'],

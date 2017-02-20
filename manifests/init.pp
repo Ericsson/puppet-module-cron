@@ -96,7 +96,7 @@ class cron (
       }
     }
     default: {
-      fail("cron supports osfamilies RedHat, Suse and Debian. Detected osfamily is <${::osfamily}>.")
+      fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
     }
   }
 
@@ -116,11 +116,7 @@ class cron (
     }
   }
 
-  case $periodic_jobs_manage {
-    true, 'true':   { $periodic_jobs_manage_bool = true } # lint:ignore:quoted_booleans
-    false, 'false': { $periodic_jobs_manage_bool = false } # lint:ignore:quoted_booleans
-    default:        { fail('cron::periodic_jobs_manage is not a boolean.') }
-  }
+  $periodic_jobs_manage_bool = str2bool($periodic_jobs_manage)
 
   if $periodic_jobs_manage_bool == true {
     $periodic_jobs_content_real = $periodic_jobs_content ? {
