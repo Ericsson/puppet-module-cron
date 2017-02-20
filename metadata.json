@@ -9,12 +9,6 @@
   "issues_url": "https://github.com/Ericsson/puppet-module-cron/issues",
   "operatingsystem_support": [
     {
-      "operatingsystem": "Debian",
-      "operatingsystemrelease": [
-        "6"
-      ]
-    },
-    {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
         "5",

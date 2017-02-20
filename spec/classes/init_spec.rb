@@ -84,10 +84,10 @@ describe 'cron' do
         :service_name => 'cron',
         :crontab      => crontab_default + crontab_periodics_suse,
       },
-    'Debian 7' =>
+    'Ubuntu 12' =>
       {
         :osfamily     => 'Debian',
-        :osrelease    => '7.9',
+        :osrelease    => '12.04',
         :package_name => 'cron',
         :service_name => 'cron',
         :crontab     => crontab_default,
@@ -509,7 +509,7 @@ describe 'cron' do
     it 'should fail' do
       expect {
         should contain_class(subject)
-      }.to raise_error(Puppet::Error,/supports osfamilies RedHat, Suse and Debian/)
+      }.to raise_error(Puppet::Error,/supports osfamilies RedHat, Suse and Ubuntu/)
     end
   end
 
