@@ -1,3 +1,9 @@
+##2017-02-20 - Release 2.2.0
+### Summary
+Clarify Ubuntu support (remove descriptions pointing to Debian)
+Support Puppet 4.9
+Appease Puppet Forge scoring
+
 ##2016-08-01 - Release 2.1.0
 ### Summary
 Fixed periodic cron jobs not getting removed on RHEL5 and Suse anymore.
