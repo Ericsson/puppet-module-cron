@@ -37,10 +37,24 @@ class cron (
   $service_enable        = true,
   $service_ensure        = 'running',
   $service_name          = 'USE_DEFAULTS',
-  # deprecated
+  $user_crontabs         = undef,
+  $user_crontabs_merge   = true,
+  # deprecate
   $enable_cron           = undef,
   $ensure_state          = undef,
 ) {
+
+  if $user_crontabs != undef {
+    case str2bool($user_crontabs_merge) {
+      true: {
+        # Hash crontabs from various hiera hierarchies
+        $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
+      }
+      default: { $user_crontabs_real = $user_crontabs }
+    }
+  } else {
+    $user_crontabs_real = undef
+  }
 
   if $enable_cron != undef {
     notify { '*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!': }
@@ -174,6 +188,13 @@ class cron (
     create_resources(cron::fragment,$cron_files)
   }
 
+  # lint:ignore:undef_in_function # unsure why it get triggerd here
+  if $user_crontabs_real != undef {
+    validate_hash($user_crontabs_real)
+    create_resources(cron::user::crontab, $user_crontabs_real)
+  }
+  # lint:endignore
+
   validate_absolute_path($cron_allow_path)
   validate_absolute_path($cron_deny_path)
   validate_absolute_path($crontab_path)
@@ -182,6 +203,7 @@ class cron (
   validate_absolute_path($cron_daily_path)
   validate_absolute_path($cron_weekly_path)
   validate_absolute_path($cron_monthly_path)
+
 
   if is_string($cron_allow_group) == false { fail('cron::cron_allow_group must be a string') }
   if is_string($cron_allow_owner) == false { fail('cron::cron_allow_owner must be a string') }
@@ -200,7 +222,6 @@ class cron (
     "cron::cron_allow_mode is <${cron_allow_mode}> and must be a valid four digit mode in octal notation.")
   validate_re($cron_deny_mode, '^[0-7]{4}$',
     "cron::cron_deny_mode is <${cron_deny_mode}> and must be a valid four digit mode in octal notation.")
-
   # End of validation
 
   file { 'cron_allow':
