@@ -247,6 +247,12 @@ Name of the cron service. Specify this to change the platform's default.
 
 - *Default*: 'USE_DEFAULTS'
 
+user_crontabs (hash)
+--------------------
+Hash of users and user cronjobs.
+
+- *Default*: undef
+
 
 ## Sample usage:
 
@@ -344,3 +350,109 @@ The type of cron job. This generally refers to "/etc/cron.${type}/". Valid
 values are 'd', 'hourly, 'daily', 'weekly', 'monthly' and 'yearly'.
 
 - *Default*: 'daily'
+
+## Define cron::user::crontab
+
+Often application teams or application users have crontabs that must execute as the application user.  This grants the ability to manage those crontab entries.
+
+Example:  DBA may want all database systems to have a specific cronjob executed as the oracle or mysql user.
+
+
+*By default this is called from the parent class cron.  Data is provided for description.*
+
+
+### Parameters
+
+ensure (string)
+---------------
+String for the ensure parameter of the user crontab file.  
+
+- *Default*: 'file'
+
+owner (string)
+--------------
+Owner of the user's crontab file.  Default is undef which will result in the filename and user being the same.
+
+- *Default*: undef
+
+group (string)
+--------------
+Group owner of the user's crontab file.  Default is undef which will result in the filename and group being the same.
+
+- *Default*: undef
+
+mode (string)
+-------------
+Filemode of the user's crontab file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+
+- *Default*: '0600'
+
+path (string)
+-------------
+Path to the user's crontab file. Leave it unset (undef) to use the OS vendor defaults values.
+
+- *Default*: undef
+
+content (string)
+----------------
+Advanced usage Content of the user's crontab file.  Warning: Leave alone to use included template.
+--------------                                      --------
+
+- *Default*: template('cron/usercrontab.erb')
+
+vars (array)
+------------
+Variables to add to user's crontab file.  
+
+- *Default*: undef
+- *undef results in*:
+<pre>   
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=<user>
+HOME=/home/<user>
+</pre>
+
+entries (hash)
+--------------
+Hash of user's and user crontabs.  
+
+- *Default*: undef
+
+
+### Usage
+
+Simply insert the hiera data in your hiera hierarchy and there will be a hiera_hash of all hiera levels.
+
+Hiera data structure to be used by the parent class cron:
+<pre>
+cron::user_crontabs:
+  'user1':
+    vars:
+      -  'SHELL=/bin/bash'
+      -  'MYECHO=$(which echo)'
+    entries:
+      - '# Echo Hello World'
+      - '* 1 * * * $MYECHO "Hello World!" 2>&1'
+  'user2':
+    vars:
+      -  'SHELL=/bin/bash'
+      -  'MYECHO=$(which echo)'
+    entries:
+      - '# Echo Hello World'
+      - '* 3 * * * $MYECHO "Hello user2!" 2>&1'
+</pre>
+
+
+
+Example of how to create resources function outside of the cron module.
+-----------------------------------------------------------------------
+<pre>
+  $user_crontabs => {
+    'user1' => {'vars' => [ 'SHELL=/bin/bash', 'MYECHO=$(which echo)' ], 'entries' => [ '# Echo Hello World', '* 1 * * * $MYECHO "Hello World!"' ]},
+    'user2' => {'vars' => [ 'SHELL=/bin/bash', 'MYECHO=$(which echo)' ], 'entries' => [ '# Echo Hello World', '* 3 * * * $MYECHO "Hello user2!"' ]}
+  }
+  create_resources(cron::user::crontab, $user_crontabs)
+</pre>
+
+
