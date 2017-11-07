@@ -37,12 +37,13 @@ class cron (
   $service_enable                = true,
   $service_ensure                = 'running',
   $service_name                  = 'USE_DEFAULTS',
-  $user_crontabs                 = hiera_hash('cron::user_crontabs'),
   # deprecated
   $enable_cron                   = undef,
   $ensure_state                  = undef,
 ) {
 
+  # Hash crontabs from various hiera hierarchies
+  $user_crontabs = hiera_hash('cron::user_crontabs', undef)
 
   if $enable_cron != undef {
     notify { '*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!': }
@@ -58,7 +59,7 @@ class cron (
     $service_ensure_real = $service_ensure
   }
 
-  
+
   case $::osfamily {
     'Debian': {
       $package_name_default = 'cron'
@@ -104,8 +105,8 @@ class cron (
     default: {
       fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
     }
-  }  
-  
+  }
+
 
   if $package_name == 'USE_DEFAULTS' {
     $package_name_array = $package_name_default
@@ -180,7 +181,7 @@ class cron (
     validate_hash($cron_files)
     create_resources(cron::fragment,$cron_files)
   }
-  
+
   if $user_crontabs != undef {
     validate_hash($user_crontabs)
     create_resources(cron::user::crontab, $user_crontabs)
@@ -194,7 +195,7 @@ class cron (
   validate_absolute_path($cron_daily_path)
   validate_absolute_path($cron_weekly_path)
   validate_absolute_path($cron_monthly_path)
-  
+
 
   if is_string($cron_allow_group) == false { fail('cron::cron_allow_group must be a string') }
   if is_string($cron_allow_owner) == false { fail('cron::cron_allow_owner must be a string') }
@@ -213,7 +214,7 @@ class cron (
     "cron::cron_allow_mode is <${cron_allow_mode}> and must be a valid four digit mode in octal notation.")
   validate_re($cron_deny_mode, '^[0-7]{4}$',
     "cron::cron_deny_mode is <${cron_deny_mode}> and must be a valid four digit mode in octal notation.")
-    
+
 
   # End of validation
 

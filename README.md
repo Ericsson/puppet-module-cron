@@ -429,18 +429,18 @@ Hiera data structure to be used by the parent class cron:
 cron::user_crontabs:
   'user1':
     vars:
-      -  'SHELL=/bin/bash'
-      -  'MYECHO=$(which echo)'
+      'SHELL': '/bin/bash'
+      'MYECHO': '$(which echo)'
     entries:
-      - '# Echo Hello World'
-      - '* 1 * * * $MYECHO "Hello World!" 2>&1'
+      '# Echo Hello World':
+        - '* 1 * * * $MYECHO "Hello World!" 2>&1'
   'user2':
     vars:
-      -  'SHELL=/bin/bash'
-      -  'MYECHO=$(which echo)'
+      'SHELL': '/bin/bash'
+      'MYECHO': '$(which echo)'
     entries:
-      - '# Echo Hello World'
-      - '* 3 * * * $MYECHO "Hello user2!" 2>&1'
+      '# Echo Hello World':
+        - '* 3 * * * $MYECHO "Hello user2!" 2>&1'
 </pre>
 
 
@@ -449,8 +449,8 @@ Example of how to create resources function outside of the cron module.
 -----------------------------------------------------------------------
 <pre>
   $user_crontabs => {
-    'user1' => {'vars' => [ 'SHELL=/bin/bash', 'MYECHO=$(which echo)' ], 'entries' => [ '# Echo Hello World', '* 1 * * * $MYECHO "Hello World!"' ]},
-    'user2' => {'vars' => [ 'SHELL=/bin/bash', 'MYECHO=$(which echo)' ], 'entries' => [ '# Echo Hello World', '* 3 * * * $MYECHO "Hello user2!"' ]}
+    'user1' => {'vars' => [ 'SHELL': '/bin/bash', 'MYECHO': '$(which echo)' ], 'entries' => [ '# Echo Hello World': '* 1 * * * $MYECHO "Hello World!"' ]},
+    'user2' => {'vars' => [ 'SHELL': '/bin/bash', 'MYECHO': '$(which echo)' ], 'entries' => [ '# Echo Hello World': '* 3 * * * $MYECHO "Hello user2!"' ]}
   }
   create_resources(cron::user::crontab, $user_crontabs)
 </pre>
