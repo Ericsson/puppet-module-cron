@@ -39,13 +39,29 @@ define cron::user::crontab (
   $owner   = undef,
   $group   = undef,
   $mode    = '0600',
-  $path    = $cron::user_crontab_path,
+  $path    = undef,
   $content = undef,
   $vars    = undef,
   $entries = undef,
 ){
 
   include ::cron
+
+  case $::osfamily {
+    'Debian': {
+      $user_crontab_path = '/var/spool/cron/crontabs'
+    }
+    'Suse': {
+      $user_crontab_path = '/var/spool/cron/tabs'
+    }
+    'RedHat': {
+      $user_crontab_path = '/var/spool/cron'
+    }
+    default: {
+      fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
+    }
+  }
+
 
   if $owner == undef {
     $myowner = $name

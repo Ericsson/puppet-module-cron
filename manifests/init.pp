@@ -46,7 +46,7 @@ class cron (
 
   if $user_crontabs != undef {
     case $user_crontabs_merge {
-      true: {      
+      true: {
         # Hash crontabs from various hiera hierarchies
         $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
       }
@@ -74,7 +74,6 @@ class cron (
       $package_name_default = 'cron'
       $service_name_default = 'cron'
       $periodic_jobs_content_default = []
-      $user_crontab_path = '/var/spool/cron/crontabs'
     }
     'Suse': {
       $periodic_jobs_content_default = [
@@ -83,7 +82,6 @@ class cron (
         '#',
         '-*/15 * * * *   root  test -x /usr/lib/cron/run-crons && /usr/lib/cron/run-crons >/dev/null 2>&1',
       ]
-      $user_crontab_path = '/var/spool/cron/tabs'
       if $::operatingsystemrelease =~ /^12\./ {
         $package_name_default = 'cronie'
         $service_name_default = 'cron'
@@ -95,7 +93,6 @@ class cron (
     'RedHat': {
       $package_name_default = 'crontabs'
       $service_name_default = 'crond'
-      $user_crontab_path = '/var/spool/cron'
       case $::operatingsystemrelease {
         /^5\./: {
           $periodic_jobs_content_default = [
