@@ -36,8 +36,8 @@
 #
 define cron::user::crontab (
   $ensure  = file,
-  $owner   = undef,
-  $group   = undef,
+  $owner   = $name,
+  $group   = $name,
   $mode    = '0600',
   $path    = undef,
   $content = undef,
@@ -46,35 +46,24 @@ define cron::user::crontab (
 ){
 
   include ::cron
-
-  case $::osfamily {
-    'Debian': {
-      $user_crontab_path = '/var/spool/cron/crontabs'
+  if $path == undef {
+    case $::osfamily {
+      'Debian': {
+        $path_real = '/var/spool/cron/crontabs'
+      }
+      'Suse': {
+        $path_real = '/var/spool/cron/tabs'
+      }
+      'RedHat': {
+        $path_real = '/var/spool/cron'
+      }
+      default: {
+        fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
+      }
     }
-    'Suse': {
-      $user_crontab_path = '/var/spool/cron/tabs'
-    }
-    'RedHat': {
-      $user_crontab_path = '/var/spool/cron'
-    }
-    default: {
-      fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
-    }
-  }
-
-
-  if $owner == undef {
-    $myowner = $name
   }
   else {
-    $myowner = $owner
-  }
-
-  if $group == undef {
-    $mygroup = $name
-  }
-  else {
-    $mygroup = $group
+    $path_real = $path
   }
 
   if $entries != undef {
@@ -87,17 +76,17 @@ define cron::user::crontab (
     $crontab_vars = $vars
   }
 
-  if is_string($myowner) == undef { fail('cron::user::crontab::owner must be a string') }
-  if is_string($mygroup) == undef { fail('cron::user::crontab::group must be a string') }
+  if is_string($owner) == undef { fail('cron::user::crontab::owner must be a string') }
+  if is_string($group) == undef { fail('cron::user::crontab::group must be a string') }
 
-  validate_absolute_path($path)
+  validate_absolute_path($path_real)
   validate_re($ensure, '^(absent|file|present)$', "cron::fragment::ensure is ${ensure} and must be absent, file or present")
   validate_re($mode, '^[0-7]{4}$', "cron::fragment::mode is <${mode}> and must be a valid four digit mode in octal notation.")
 
-  file { "${path}/${name}":
+  file { "${path_real}/${name}":
     ensure  => file,
-    owner   => $myowner,
-    group   => $mygroup,
+    owner   => $owner,
+    group   => $group,
     mode    => $mode,
     content => $content ? {
       undef => template('cron/crontab.erb'),
