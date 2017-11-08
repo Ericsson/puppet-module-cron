@@ -40,10 +40,19 @@ class cron (
   # deprecate
   $enable_cron           = undef,
   $ensure_state          = undef,
+  $user_crontabs         = undef,
+  $user_crontabs_merge   = true,
 ) {
 
-  # Hash crontabs from various hiera hierarchies
-  $user_crontabs = hiera_hash('cron::user_crontabs', undef)
+  if $user_crontabs != undef {
+    case $user_crontabs_merge {
+      true: {      
+        # Hash crontabs from various hiera hierarchies
+        $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
+      }
+      default: { $user_crontabs_real = $user_crontabs }
+    }
+  }
 
   if $enable_cron != undef {
     notify { '*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!': }
@@ -182,9 +191,9 @@ class cron (
     create_resources(cron::fragment,$cron_files)
   }
 
-  if $user_crontabs != undef {
-    validate_hash($user_crontabs)
-    create_resources(cron::user::crontab, $user_crontabs)
+  if $user_crontabs_real != undef {
+    validate_hash($user_crontabs_real)
+    create_resources(cron::user::crontab, $user_crontabs_real)
   }
 
   validate_absolute_path($cron_allow_path)
