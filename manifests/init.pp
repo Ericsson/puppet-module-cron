@@ -37,21 +37,23 @@ class cron (
   $service_enable        = true,
   $service_ensure        = 'running',
   $service_name          = 'USE_DEFAULTS',
+  $user_crontabs         = undef,
+  $user_crontabs_merge   = true,
   # deprecate
   $enable_cron           = undef,
   $ensure_state          = undef,
-  $user_crontabs         = undef,
-  $user_crontabs_merge   = true,
 ) {
 
   if $user_crontabs != undef {
-    case $user_crontabs_merge {
+    case str2bool($user_crontabs_merge) {
       true: {
         # Hash crontabs from various hiera hierarchies
         $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
       }
       default: { $user_crontabs_real = $user_crontabs }
     }
+  } else {
+    $user_crontabs_real = undef
   }
 
   if $enable_cron != undef {
@@ -67,7 +69,6 @@ class cron (
   } else {
     $service_ensure_real = $service_ensure
   }
-
 
   case $::osfamily {
     'Debian': {
@@ -112,7 +113,6 @@ class cron (
       fail("cron supports osfamilies RedHat, Suse and Ubuntu. Detected osfamily is <${::osfamily}>.")
     }
   }
-
 
   if $package_name == 'USE_DEFAULTS' {
     $package_name_array = $package_name_default
@@ -188,10 +188,12 @@ class cron (
     create_resources(cron::fragment,$cron_files)
   }
 
+  # lint:ignore:undef_in_function # unsure why it get triggerd here
   if $user_crontabs_real != undef {
     validate_hash($user_crontabs_real)
     create_resources(cron::user::crontab, $user_crontabs_real)
   }
+  # lint:endignore
 
   validate_absolute_path($cron_allow_path)
   validate_absolute_path($cron_deny_path)
@@ -220,8 +222,6 @@ class cron (
     "cron::cron_allow_mode is <${cron_allow_mode}> and must be a valid four digit mode in octal notation.")
   validate_re($cron_deny_mode, '^[0-7]{4}$',
     "cron::cron_deny_mode is <${cron_deny_mode}> and must be a valid four digit mode in octal notation.")
-
-
   # End of validation
 
   file { 'cron_allow':
