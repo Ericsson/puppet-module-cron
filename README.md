@@ -253,7 +253,7 @@ Hash of users and user cronjobs.
 
 - *Default*: undef
 
-user_crontabs_merge (bool)
+user_crontabs_hiera_merge (bool)
 --------------------
 Boolean flag to turn off and on merging for Hiera.
 
@@ -406,7 +406,7 @@ content (string)
 
 vars (array)
 ------------
-Variables to add to user's crontab file.
+Variables to add to user's crontab file. **Hint**: Will be ignored if $content is set.
 
 - *Default*: undef
 - *undef results in*:
@@ -419,7 +419,7 @@ HOME=/home/<user>
 
 entries (hash)
 --------------
-Hash of user's and user crontabs.
+Hash of user's and user crontabs. **Hint**: Will be ignored if $content is set.
 
 - *Default*: undef
 
