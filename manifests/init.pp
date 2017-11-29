@@ -44,18 +44,6 @@ class cron (
   $ensure_state                = undef,
 ) {
 
-  if $user_crontabs != undef {
-    case str2bool($user_crontabs_hiera_merge) {
-      true: {
-        # Hash crontabs from various hiera hierarchies
-        $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
-      }
-      default: { $user_crontabs_real = $user_crontabs }
-    }
-  } else {
-    $user_crontabs_real = undef
-  }
-
   if $enable_cron != undef {
     notify { '*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!': }
     $service_enable_real = $enable_cron
@@ -130,6 +118,21 @@ class cron (
     }
   }
 
+  $user_crontabs_hiera_merge_bool = str2bool($user_crontabs_hiera_merge)
+
+  if $user_crontabs != undef {
+    case $user_crontabs_hiera_merge_bool {
+      true: {
+        # Hash crontabs from various hiera hierarchies
+        $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
+      }
+      default: { $user_crontabs_real = $user_crontabs }
+    }
+    validate_hash($user_crontabs_real)
+  } else {
+    $user_crontabs_real = undef
+  }
+
   $periodic_jobs_manage_bool = str2bool($periodic_jobs_manage)
 
   if $periodic_jobs_manage_bool == true {
@@ -187,13 +190,6 @@ class cron (
     validate_hash($cron_files)
     create_resources(cron::fragment,$cron_files)
   }
-
-  # lint:ignore:undef_in_function # unsure why it get triggerd here
-  if $user_crontabs_real != undef {
-    validate_hash($user_crontabs_real)
-    create_resources(cron::user::crontab, $user_crontabs_real)
-  }
-  # lint:endignore
 
   validate_absolute_path($cron_allow_path)
   validate_absolute_path($cron_deny_path)
@@ -311,5 +307,9 @@ class cron (
     name      => $service_name_real,
     require   => File['crontab'],
     subscribe => File['crontab'],
+  }
+
+  if $user_crontabs_real != undef {
+    create_resources(cron::user::crontab, $user_crontabs_real)
   }
 }
