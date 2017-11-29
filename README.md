@@ -72,7 +72,7 @@ Name of the group of the crontab file.
 
 crontab_mode (string)
 ---------------------
-Filemode of the  crontab file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+Filemode of the crontab file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
@@ -110,7 +110,7 @@ Name of the group of the cron_allow file.
 
 cron_allow_mode (string)
 ------------------------
-Filemode of the  cron_allow file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+Filemode of the cron_allow file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
@@ -134,7 +134,7 @@ Name of the group of the cron_deny file.
 
 cron_deny_mode (string)
 -----------------------
-Filemode of the  cron_deny file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+Filemode of the cron_deny file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
@@ -295,7 +295,6 @@ cron::cron_files:
 cron::cron_allow: 'present'
 cron::cron_allow_users:
      - user1
-
 </pre>
 
 **Manage /etc/cron.deny**
@@ -359,31 +358,31 @@ values are 'd', 'hourly, 'daily', 'weekly', 'monthly' and 'yearly'.
 
 ## Define cron::user::crontab
 
-Often application teams or application users have crontabs that must execute as the application user.  This grants the ability to manage those crontab entries.
+Often application teams or application users have crontabs that must execute as the application user. This grants the ability to manage those crontab entries.
 
-Example:  DBA may want all database systems to have a specific cronjob executed as the oracle or mysql user.
+Example: DBA may want all database systems to have a specific cronjob executed as the oracle or mysql user.
 
 
-*By default this is called from the parent class cron.  Data is provided for description.*
+*By default this is called from the parent class cron. Data is provided for description.*
 
 
 ### Parameters
 
 ensure (string)
 ---------------
-String for the ensure parameter of the user crontab file.  
+String for the ensure parameter of the user crontab file.
 
 - *Default*: 'file'
 
 owner (string)
 --------------
-Owner of the user's crontab file.  Default is undef which will result in the filename and user being the same.
+Owner of the user's crontab file. Default is undef which will result in the filename and user being the same.
 
 - *Default*: undef
 
 group (string)
 --------------
-Group owner of the user's crontab file.  Default is undef which will result in the filename and group being the same.
+Group owner of the user's crontab file. Default is undef which will result in the filename and group being the same.
 
 - *Default*: undef
 
@@ -401,18 +400,17 @@ Path to the user's crontab file. Leave it unset (undef) to use the OS vendor def
 
 content (string)
 ----------------
-Advanced usage Content of the user's crontab file.  Warning: Leave alone to use included template.
---------------                                      --------
+**Advanced usage** Content of the user's crontab file. **Warning**: Leave alone to use included template.
 
 - *Default*: template('cron/usercrontab.erb')
 
 vars (array)
 ------------
-Variables to add to user's crontab file.  
+Variables to add to user's crontab file.
 
 - *Default*: undef
 - *undef results in*:
-<pre>   
+<pre>
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=<user>
@@ -421,7 +419,7 @@ HOME=/home/<user>
 
 entries (hash)
 --------------
-Hash of user's and user crontabs.  
+Hash of user's and user crontabs.
 
 - *Default*: undef
 
@@ -449,8 +447,6 @@ cron::user_crontabs:
         - '* 3 * * * $MYECHO "Hello user2!" 2>&1'
 </pre>
 
-
-
 Example of how to create resources function outside of the cron module.
 -----------------------------------------------------------------------
 <pre>
@@ -460,5 +456,3 @@ Example of how to create resources function outside of the cron module.
   }
   create_resources(cron::user::crontab, $user_crontabs)
 </pre>
-
-
