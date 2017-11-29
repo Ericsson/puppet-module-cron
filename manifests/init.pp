@@ -3,58 +3,46 @@
 # This module manages cron
 #
 class cron (
-  $package_ensure        = 'installed',
-  $package_name          = 'USE_DEFAULTS',
-  $crontab_path          = '/etc/crontab',
-  $crontab_owner         = 'root',
-  $crontab_group         = 'root',
-  $crontab_mode          = '0644',
-  $cron_allow            = 'absent',
-  $cron_deny             = 'present',
-  $cron_allow_path       = '/etc/cron.allow',
-  $cron_allow_owner      = 'root',
-  $cron_allow_group      = 'root',
-  $cron_allow_mode       = '0644',
-  $cron_deny_path        = '/etc/cron.deny',
-  $cron_deny_owner       = 'root',
-  $cron_deny_group       = 'root',
-  $cron_deny_mode        = '0644',
-  $cron_d_path           = '/etc/cron.d',
-  $cron_hourly_path      = '/etc/cron.hourly',
-  $cron_daily_path       = '/etc/cron.daily',
-  $cron_weekly_path      = '/etc/cron.weekly',
-  $cron_monthly_path     = '/etc/cron.monthly',
-  $cron_dir_owner        = 'root',
-  $cron_dir_group        = 'root',
-  $cron_dir_mode         = '0755',
-  $cron_files            = undef,
-  $cron_allow_users      = undef,
-  $cron_deny_users       = undef,
-  $crontab_vars          = undef,
-  $crontab_tasks         = undef,
-  $periodic_jobs_content = undef,
-  $periodic_jobs_manage  = true,
-  $service_enable        = true,
-  $service_ensure        = 'running',
-  $service_name          = 'USE_DEFAULTS',
-  $user_crontabs         = undef,
-  $user_crontabs_merge   = true,
+  $package_ensure              = 'installed',
+  $package_name                = 'USE_DEFAULTS',
+  $crontab_path                = '/etc/crontab',
+  $crontab_owner               = 'root',
+  $crontab_group               = 'root',
+  $crontab_mode                = '0644',
+  $cron_allow                  = 'absent',
+  $cron_deny                   = 'present',
+  $cron_allow_path             = '/etc/cron.allow',
+  $cron_allow_owner            = 'root',
+  $cron_allow_group            = 'root',
+  $cron_allow_mode             = '0644',
+  $cron_deny_path              = '/etc/cron.deny',
+  $cron_deny_owner             = 'root',
+  $cron_deny_group             = 'root',
+  $cron_deny_mode              = '0644',
+  $cron_d_path                 = '/etc/cron.d',
+  $cron_hourly_path            = '/etc/cron.hourly',
+  $cron_daily_path             = '/etc/cron.daily',
+  $cron_weekly_path            = '/etc/cron.weekly',
+  $cron_monthly_path           = '/etc/cron.monthly',
+  $cron_dir_owner              = 'root',
+  $cron_dir_group              = 'root',
+  $cron_dir_mode               = '0755',
+  $cron_files                  = undef,
+  $cron_allow_users            = undef,
+  $cron_deny_users             = undef,
+  $crontab_vars                = undef,
+  $crontab_tasks               = undef,
+  $periodic_jobs_content       = undef,
+  $periodic_jobs_manage        = true,
+  $service_enable              = true,
+  $service_ensure              = 'running',
+  $service_name                = 'USE_DEFAULTS',
+  $user_crontabs               = undef,
+  $user_crontabs_hiera_merge   = true,
   # deprecate
-  $enable_cron           = undef,
-  $ensure_state          = undef,
+  $enable_cron                 = undef,
+  $ensure_state                = undef,
 ) {
-
-  if $user_crontabs != undef {
-    case str2bool($user_crontabs_merge) {
-      true: {
-        # Hash crontabs from various hiera hierarchies
-        $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
-      }
-      default: { $user_crontabs_real = $user_crontabs }
-    }
-  } else {
-    $user_crontabs_real = undef
-  }
 
   if $enable_cron != undef {
     notify { '*** DEPRECATION WARNING***: $enable_cron was renamed to $service_enable. Please update your configuration. Support for $enable_cron will be removed in the near future!': }
@@ -130,6 +118,21 @@ class cron (
     }
   }
 
+  $user_crontabs_hiera_merge_bool = str2bool($user_crontabs_hiera_merge)
+
+  if $user_crontabs != undef {
+    case $user_crontabs_hiera_merge_bool {
+      true: {
+        # Hash crontabs from various hiera hierarchies
+        $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
+      }
+      default: { $user_crontabs_real = $user_crontabs }
+    }
+    validate_hash($user_crontabs_real)
+  } else {
+    $user_crontabs_real = undef
+  }
+
   $periodic_jobs_manage_bool = str2bool($periodic_jobs_manage)
 
   if $periodic_jobs_manage_bool == true {
@@ -187,13 +190,6 @@ class cron (
     validate_hash($cron_files)
     create_resources(cron::fragment,$cron_files)
   }
-
-  # lint:ignore:undef_in_function # unsure why it get triggerd here
-  if $user_crontabs_real != undef {
-    validate_hash($user_crontabs_real)
-    create_resources(cron::user::crontab, $user_crontabs_real)
-  }
-  # lint:endignore
 
   validate_absolute_path($cron_allow_path)
   validate_absolute_path($cron_deny_path)
@@ -311,5 +307,9 @@ class cron (
     name      => $service_name_real,
     require   => File['crontab'],
     subscribe => File['crontab'],
+  }
+
+  if $user_crontabs_real != undef {
+    create_resources(cron::user::crontab, $user_crontabs_real)
   }
 }

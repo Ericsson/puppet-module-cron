@@ -82,7 +82,7 @@ define cron::user::crontab (
   $content_real = $content ? {
     undef   => "template('cron/crontab.erb')",
     default => $content,
-  },
+  }
 
   file { "${path_real}/${name}":
     ensure  => file,
