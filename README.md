@@ -253,7 +253,7 @@ Hash of users and user cronjobs.
 
 - *Default*: undef
 
-user_crontabs_merge (bool)
+user_crontabs_hiera_merge (bool)
 --------------------
 Boolean flag to turn off and on merging for Hiera.
 
