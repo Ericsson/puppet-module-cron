@@ -1,5 +1,3 @@
-source ENV['GEM_SOURCE'] || 'https://rubygems.org'
-
 if puppetversion = ENV['PUPPET_GEM_VERSION']
   gem 'puppet', puppetversion, :require => false
 else
@@ -31,3 +29,4 @@ gem 'puppetlabs_spec_helper', '2.0.2'    if RUBY_VERSION >= '1.8.7' && RUBY_VERS
 gem 'puppetlabs_spec_helper', '>= 2.0.0' if RUBY_VERSION >= '1.9'
 gem 'rake',                   '~> 10.0'  if RUBY_VERSION >= '1.8.7' && RUBY_VERSION < '1.9'
 gem 'rspec',                  '~> 2.0'   if RUBY_VERSION >= '1.8.7' && RUBY_VERSION < '1.9'
+
