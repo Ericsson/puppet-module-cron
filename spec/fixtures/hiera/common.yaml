@@ -3,4 +3,4 @@ cron::user_crontabs:
   'from_hiera_common':
     'entries':
       '#from hiera common':
-        '* 2 4 2 * /bin/true'
+        - '* 2 4 2 * /bin/true'
