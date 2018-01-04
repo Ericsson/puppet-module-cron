@@ -47,9 +47,9 @@ define cron::fragment (
   include ::cron
 
   validate_re($ensure_real, '^(absent|file|present)$', "cron::fragment::ensure is ${ensure} and must be absent, file or present")
-  if is_string($content_real) == false { fail('cron::fragment::content must be a string') }
-  if is_string($owner) == false { fail('cron::fragment::owner must be a string') }
-  if is_string($group) == false { fail('cron::fragment::group must be a string') }
+  if is_string($content_real) == false { fail('cron::fragment::content is not a string') }
+  if is_string($owner) == false { fail('cron::fragment::owner is not a string') }
+  if is_string($group) == false { fail('cron::fragment::group is not a string') }
   validate_re($mode_real, '^[0-7]{4}$',
     "cron::fragment::mode is <${mode_real}> and must be a valid four digit mode in octal notation.")
 

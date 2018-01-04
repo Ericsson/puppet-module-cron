@@ -59,7 +59,7 @@ define cron::user::crontab (
   }
 
   if $content != undef and is_string($content) == false {
-    fail('cron::user::crontab::content must be a string')
+    fail('cron::user::crontab::content is not a string')
   }
 
   if $entries != undef {
@@ -72,8 +72,8 @@ define cron::user::crontab (
     $crontab_vars = $vars
   }
 
-  if is_string($owner) == false { fail('cron::user::crontab::owner must be a string') }
-  if is_string($group) == false { fail('cron::user::crontab::group must be a string') }
+  if is_string($owner) == false { fail('cron::user::crontab::owner is not a string') }
+  if is_string($group) == false { fail('cron::user::crontab::group is not a string') }
 
   validate_absolute_path($path_real)
   validate_re($ensure, '^(absent|file|present)$', "cron::fragment::ensure is ${ensure} and must be absent, file or present")
