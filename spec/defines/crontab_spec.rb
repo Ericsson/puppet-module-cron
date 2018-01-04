@@ -1,12 +1,34 @@
 require 'spec_helper'
 describe 'cron::user::crontab' do
 
+  platforms = {
+    'Debian' => {
+      :facts_hash => {
+        :osfamily               => 'Debian',
+        :operatingsystemrelease => '8.0',
+      },
+      :path_default => '/var/spool/cron/crontabs'
+    },
+    'RedHat' => {
+      :facts_hash => {
+        :osfamily               => 'RedHat',
+        :operatingsystemrelease => '6.7',
+      },
+      :path_default => '/var/spool/cron'
+    },
+    'Suse' => {
+      :facts_hash => {
+        :osfamily               => 'Suse',
+        :operatingsystemrelease => '12.1',
+      },
+      :path_default => '/var/spool/cron/tabs'
+    },
+  }
+
   let(:title) { 'operator' }
+
   let(:facts) do
-    {
-      :osfamily               => 'RedHat',
-      :operatingsystemrelease => '6.7',
-    }
+    platforms['RedHat'][:facts_hash]
   end
 
   crontab_default = <<-END.gsub(/^\s+\|/, '')
@@ -30,19 +52,23 @@ describe 'cron::user::crontab' do
     |
   END
 
-  context 'with default values for parameters on valid osfamily RedHat' do
-    it { should compile.with_all_deps }
-    it { should contain_class('cron') }
+  platforms.sort.each do |osfamily,v|
+    describe "with default values for parameters on valid osfamily #{osfamily}" do
+      let(:facts) { v[:facts_hash] }
 
-    it do
-      should contain_file('/var/spool/cron/operator').with({
-        'ensure'  => 'file',
-        'owner'   => 'operator',
-        'group'   => 'operator',
-        'mode'    => '0600',
-        'content' => crontab_default,
-        'require' => 'File[crontab]',
-      })
+      it { should compile.with_all_deps }
+      it { should contain_class('cron') }
+
+      it do
+        should contain_file("#{v[:path_default]}/operator").with({
+          'ensure'  => 'file',
+          'owner'   => 'operator',
+          'group'   => 'operator',
+          'mode'    => '0600',
+          'content' => crontab_default,
+          'require' => 'File[crontab]',
+        })
+      end
     end
   end
 
