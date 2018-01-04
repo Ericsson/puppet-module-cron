@@ -56,17 +56,17 @@ describe 'cron::user::crontab' do
           :mode    => '0242',
         }
       end
-      
-      it {
+
+      it do
         should contain_file('/var/spool/cron/operator').with({
           'ensure'  => 'file',
           'owner'   => 'operator',
           'group'   => 'operator',
           'mode'    => '0242',
         })
-      }      
+      end
     end
-    
+
     context 'with entries set' do
       let (:params) do
         {
@@ -77,11 +77,11 @@ describe 'cron::user::crontab' do
           :content => "# Echo Hello World\n* 1 * * * $MYECHO \"Hello World!\" 2>&1", 
         }
       end
-      
+
       it { should contain_file('/var/spool/cron/operator').with_content("# Echo Hello World\n* 1 * * * $MYECHO \"Hello World!\" 2>&1") }
-      
+
     end
-    
+
     context 'with vars set' do
       let (:params) do
         {
@@ -92,10 +92,10 @@ describe 'cron::user::crontab' do
           :content => 'SHELL=/bin/bash',
         }
       end
-      
+
       it { should contain_file('/var/spool/cron/operator').with_content("SHELL=/bin/bash") }    
-    end      
-  end      
+    end
+  end
 
   describe 'variable type and content validations' do
     validations = {
@@ -153,5 +153,4 @@ describe 'cron::user::crontab' do
       end # var[:name].each
     end # validations.sort.each
   end # describe 'variable type and content validations'
-
 end
