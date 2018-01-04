@@ -46,55 +46,46 @@ describe 'cron::user::crontab' do
     end
   end
 
-  context 'with parameters set' do
-    context 'when ensure, owner, group and mode are set' do
-      let (:params) do
-        {
-          :ensure  => 'file',
-          :owner   => 'operator',
-          :group   => 'operator',
-          :mode    => '0242',
-        }
-      end
-
-      it do
-        should contain_file('/var/spool/cron/operator').with({
-          'ensure'  => 'file',
-          'owner'   => 'operator',
-          'group'   => 'operator',
-          'mode'    => '0242',
-        })
-      end
+  %w(absent file present).each do |value|
+    context "with ensure set to valid string #{value}" do
+      let(:params) { { :ensure => value } }
+      it {  should contain_file('/var/spool/cron/operator').with_ensure(value) }
     end
+  end
 
-    context 'with entries set' do
-      let (:params) do
-        {
-          :ensure  => 'file',
-          :owner   => 'operator',
-          :group   => 'operator',
-          :mode    => '0242',
-          :content => "# Echo Hello World\n* 1 * * * $MYECHO \"Hello World!\" 2>&1", 
-        }
-      end
+  context 'with owner set to valid string spectester' do
+    let(:params) { { :owner => 'spectester' } }
+    it {  should contain_file('/var/spool/cron/operator').with_owner('spectester') }
+  end
 
-      it { should contain_file('/var/spool/cron/operator').with_content("# Echo Hello World\n* 1 * * * $MYECHO \"Hello World!\" 2>&1") }
+  context 'with group set to valid string spectester' do
+    let(:params) { { :group => 'spectester' } }
+    it {  should contain_file('/var/spool/cron/operator').with_group('spectester') }
+  end
 
-    end
+  context 'with mode set to valid string 0242' do
+    let(:params) { { :mode => '0242' } }
+    it {  should contain_file('/var/spool/cron/operator').with_mode('0242') }
+  end
 
-    context 'with vars set' do
-      let (:params) do
-        {
-          :ensure  => 'file',
-          :owner   => 'operator',
-          :group   => 'operator',
-          :mode    => '0242',
-          :content => 'SHELL=/bin/bash',
-        }
-      end
+  context 'with path set to valid string /test' do
+    let(:params) { { :path => '/test' } }
+    it {  should contain_file('/test/operator') }
+  end
 
-      it { should contain_file('/var/spool/cron/operator').with_content("SHELL=/bin/bash") }    
-    end
+  context 'with content set to valid string #test' do
+    let(:params) { { :content => '#test' } }
+    it {  should contain_file('/var/spool/cron/operator').with_content('#test') }
+  end
+
+  context 'with vars set to valid hash that set two variables' do
+    let(:params) { { :vars => {'SHELL' => '/bin/sh','MAILTO' => 'tester' } } }
+    it { should contain_file('/var/spool/cron/operator').with_content(/^# DO NOT EDIT[\s\S]*MAILTO=tester\nSHELL=\/bin\/sh\n# For details see man 4 crontabs/) }
+  end
+
+  context 'with entries set to a valid hash that will create two tasks' do
+    let (:params) { { :entries => {'spec' => ['0 0 2 4 2 root /bin/true','1 2 3 4 5 root /bin/false'],'test' => ['5 4 3 2 1 spec /bin/test$'] } } }
+    it { should contain_file('/var/spool/cron/operator').with_content(/^# Example of job definition:[\s\S]*# spec\n0 0 2 4 2 root \/bin\/true\n1 2 3 4 5 root \/bin\/false\n# test\n5 4 3 2 1 spec \/bin\/test/) }
   end
 
   describe 'variable type and content validations' do
