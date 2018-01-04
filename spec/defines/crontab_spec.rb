@@ -9,6 +9,43 @@ describe 'cron::user::crontab' do
     }
   end
 
+  crontab_default = <<-END.gsub(/^\s+\|/, '')
+    |# This file is being maintained by Puppet.
+    |# DO NOT EDIT
+    |
+    |SHELL=/bin/bash
+    |PATH=/sbin:/bin:/usr/sbin:/usr/bin
+    |MAILTO=root
+    |HOME=/
+    |# For details see man 4 crontabs
+    |
+    |# Example of job definition:
+    |# .---------------- minute (0 - 59)
+    |# |  .------------- hour (0 - 23)
+    |# |  |  .---------- day of month (1 - 31)
+    |# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+    |# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+    |# |  |  |  |  |
+    |# *  *  *  *  * user-name command to be executed
+    |
+  END
+
+  context 'with default values for parameters on valid osfamily RedHat' do
+    it { should compile.with_all_deps }
+    it { should contain_class('cron') }
+
+    it do
+      should contain_file('/var/spool/cron/operator').with({
+        'ensure'  => 'file',
+        'owner'   => 'operator',
+        'group'   => 'operator',
+        'mode'    => '0600',
+        'content' => crontab_default,
+        'require' => 'File[crontab]',
+      })
+    end
+  end
+
   context 'with parameters set' do
     context 'when ensure, owner, group and mode are set' do
       let (:params) do

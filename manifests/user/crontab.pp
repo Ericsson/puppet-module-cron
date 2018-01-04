@@ -80,7 +80,7 @@ define cron::user::crontab (
   validate_re($mode, '^[0-7]{4}$', "cron::fragment::mode is <${mode}> and must be a valid four digit mode in octal notation.")
 
   $content_real = $content ? {
-    undef   => "template('cron/crontab.erb')",
+    undef   => template('cron/crontab.erb'),
     default => $content,
   }
 
