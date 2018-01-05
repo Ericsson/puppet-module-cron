@@ -115,7 +115,7 @@ describe 'cron::fragment' do
         :name    => ['content','owner','group'],
         :valid   => ['valid'],
         :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
-        :message => 'must be a string',
+        :message => 'is not a string',
       },
     }
 
