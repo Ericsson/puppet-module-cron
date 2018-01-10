@@ -85,7 +85,7 @@ define cron::user::crontab (
   }
 
   file { "${path_real}/${name}":
-    ensure  => file,
+    ensure  => $ensure,
     owner   => $owner,
     group   => $group,
     mode    => $mode,
