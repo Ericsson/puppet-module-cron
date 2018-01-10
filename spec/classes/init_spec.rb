@@ -505,7 +505,7 @@ describe 'cron' do
 
     context 'with user_crontabs is set to a valid value that will create two resources and user_crontabs_hiera_merge is set to false' do
       let(:params) { {
-        :user_crontabs => {'spec' => {'entries' => { '#spec' => '* 2 4 2 * /bin/true' } },'test' => {'entries' => { '#test' => '* 2 4 2 * /bin/false' } } },
+        :user_crontabs => {'spec' => {'entries' => { '#spec' => [ '* 2 4 2 * /bin/true' ] } },'test' => {'entries' => { '#test' => [ '* 2 4 2 * /bin/false' ] } } },
         :user_crontabs_hiera_merge => false,
       } }
       it { should have_cron__user__crontab_resource_count(2) }
