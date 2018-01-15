@@ -531,16 +531,7 @@ describe 'cron' do
     end
   end
 
-  describe 'variable type and content validations' do
-    # set needed custom facts and variables
-    let(:facts) { {
-      :osfamily               => 'RedHat',
-      :operatingsystemrelease => '6.7',
-    } }
-    let(:validation_params) { {
-#      :param => 'value',
-    } }
-
+  describe 'variable data type and content validations' do
     validations = {
       'absolute_path' => {
         :name    => ['cron_allow_path','cron_deny_path','crontab_path','cron_d_path','cron_hourly_path','cron_daily_path','cron_weekly_path','cron_monthly_path'],
@@ -612,31 +603,29 @@ describe 'cron' do
         :name    => ['crontab_owner','cron_allow_owner','cron_deny_owner','cron_dir_owner','crontab_group','cron_allow_group','cron_deny_group','cron_dir_group'],
         :valid   => ['valid'],
         :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
-        :message => 'must be a string',
+        :message => 'is not a string',
       },
     }
 
-    validations.sort.each do |type,var|
+    validations.sort.each do |type, var|
+      mandatory_params = {} if mandatory_params.nil?
       var[:name].each do |var_name|
-
+        var[:params] = {} if var[:params].nil?
         var[:valid].each do |valid|
-          context "with #{var_name} (#{type}) set to valid #{valid} (as #{valid.class})" do
-            let(:params) { validation_params.merge({:"#{var_name}" => valid, }) }
+          context "when #{var_name} (#{type}) is set to valid #{valid} (as #{valid.class})" do
+            let(:params) { [mandatory_params, var[:params], { :"#{var_name}" => valid, }].reduce(:merge) }
             it { should compile }
           end
         end
 
         var[:invalid].each do |invalid|
-          context "with #{var_name} (#{type}) set to invalid #{invalid} (as #{invalid.class})" do
-            let(:params) { validation_params.merge({:"#{var_name}" => invalid, }) }
+          context "when #{var_name} (#{type}) is set to invalid #{invalid} (as #{invalid.class})" do
+            let(:params) { [mandatory_params, var[:params], { :"#{var_name}" => invalid, }].reduce(:merge) }
             it 'should fail' do
-              expect {
-                should contain_class(subject)
-              }.to raise_error(Puppet::Error,/#{var[:message]}/)
+              expect { should contain_class(subject) }.to raise_error(Puppet::Error, /#{var[:message]}/)
             end
           end
         end
-
       end # var[:name].each
     end # validations.sort.each
   end # describe 'variable type and content validations'

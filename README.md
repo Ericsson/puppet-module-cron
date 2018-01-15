@@ -72,7 +72,7 @@ Name of the group of the crontab file.
 
 crontab_mode (string)
 ---------------------
-Filemode of the  crontab file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+Filemode of the crontab file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
@@ -110,7 +110,7 @@ Name of the group of the cron_allow file.
 
 cron_allow_mode (string)
 ------------------------
-Filemode of the  cron_allow file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+Filemode of the cron_allow file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
@@ -134,7 +134,7 @@ Name of the group of the cron_deny file.
 
 cron_deny_mode (string)
 -----------------------
-Filemode of the  cron_deny file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
+Filemode of the cron_deny file. Must use the four-digit octal notation. RegEx: /^[0-9][0-9][0-9][0-9]$/
 
 - *Default*: '0644'
 
@@ -283,7 +283,6 @@ cron::cron_files:
 cron::cron_allow: 'present'
 cron::cron_allow_users:
      - user1
-
 </pre>
 
 **Manage /etc/cron.deny**
