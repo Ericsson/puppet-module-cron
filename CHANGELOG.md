@@ -1,17 +1,21 @@
-##2017-02-20 - Release 2.2.0
+## 2018-01-15 - Release 2.3.0
+### Summary
+Add support for management of User crontabs
+
+## 2017-02-20 - Release 2.2.0
 ### Summary
 Clarify Ubuntu support (remove descriptions pointing to Debian)
 Support Puppet 4.9
 Appease Puppet Forge scoring
 
-##2016-08-01 - Release 2.1.0
+## 2016-08-01 - Release 2.1.0
 ### Summary
 Fixed periodic cron jobs not getting removed on RHEL5 and Suse anymore.
 If you want to keep the old unfixed behaviour of the module, set $periodic_jobs_manage to false.
 
-##2015-12-08 - Release 2.0.0
+## 2015-12-08 - Release 2.0.0
 ### Summary
-####Breaking News
+#### Breaking News
 This release breaks with backward compatibility in these cases:
 ##### parameters that have been renamed
 - ```cron::enable_cron``` to ```cron::service_enable```
@@ -33,7 +37,7 @@ This comes at the price of deprecation warnings.
   cron_allow_users is defined in Hiera, even though cron_allow is set to
   'absent' higher up in the hierarchy.
 
-####Features
+#### Features
 - Add package_name and service_name parameters
 - Add support for SLES 12
 - Add possibility to manage file attributes of cron related directories
@@ -41,19 +45,19 @@ This comes at the price of deprecation warnings.
 - Add support for hourly cron jobs fragment files
 - Allow to use 'file' for cron.{allow|deny} ensure parameter
 
-####Bugfixes
+#### Bugfixes
 - Add documentation for cron::fragment
 - Fix dependency for fragment files
 - Validate $cron_files being a hash
 
 
-####Upgrading from 1.x
+#### Upgrading from 1.x
 When upgrading from version 1.x you need to search for the deprecated parameter names
 and replace them with the new names. There is no need to change the data itself.
 
 In most cases it should be good enough to change the keys in $cron_files hashes to the new names.
 
-#####Hiera Example:
+##### Hiera Example:
 old deprecated names
 <pre>
 cron::cron_files:
@@ -78,7 +82,7 @@ cron::cron_files:
             command
 </pre>
 
-#####Code Example:
+##### Code Example:
 old deprecated names
 <pre>
 cron::fragment { 'daily_task':
