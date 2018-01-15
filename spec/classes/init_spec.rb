@@ -502,6 +502,37 @@ describe 'cron' do
         'File[cron_monthly]',
       ] ) }
     end
+
+    context 'with user_crontabs is set to a valid value that will create two resources and user_crontabs_hiera_merge is set to false' do
+      let(:params) { {
+        :user_crontabs => {'spec' => {'entries' => { '#spec' => [ '* 2 4 2 * /bin/true' ] } },'test' => {'entries' => { '#test' => [ '* 2 4 2 * /bin/false' ] } } },
+        :user_crontabs_hiera_merge => false,
+      } }
+      it { should have_cron__user__crontab_resource_count(2) }
+      it { should contain_cron__user__crontab('spec') }
+      it { should contain_cron__user__crontab('test') }
+    end
+  end
+
+  describe 'with hiera providing data from multiple levels' do
+    let(:facts) { {
+      :osfamily               => 'RedHat',
+      :operatingsystemrelease => '6.7',
+      :fqdn                   => 'cron.example.local',
+    } }
+
+    context 'with defaults for all parameters' do
+      it { should have_cron__user__crontab_resource_count(2) }
+      it { should contain_cron__user__crontab('from_hiera_common') }
+      it { should contain_cron__user__crontab('from_hiera_fqdn') }
+    end
+
+    context 'with user_crontabs_hiera_merge set to valid <false>' do
+      let(:params) { { :user_crontabs_hiera_merge => false } }
+
+      it { should have_cron__user__crontab_resource_count(1) }
+      it { should contain_cron__user__crontab('from_hiera_fqdn') }
+    end
   end
 
   describe 'with default values for parameters on invalid OS' do
@@ -531,16 +562,7 @@ describe 'cron' do
     end
   end
 
-  describe 'variable type and content validations' do
-    # set needed custom facts and variables
-    let(:facts) { {
-      :osfamily               => 'RedHat',
-      :operatingsystemrelease => '6.7',
-    } }
-    let(:validation_params) { {
-#      :param => 'value',
-    } }
-
+  describe 'variable data type and content validations' do
     validations = {
       'absolute_path' => {
         :name    => ['cron_allow_path','cron_deny_path','crontab_path','cron_d_path','cron_hourly_path','cron_daily_path','cron_weekly_path','cron_monthly_path'],
@@ -561,15 +583,16 @@ describe 'cron' do
         :message => 'is not a string nor an array',
       },
       'boolean / stringified' => {
-        :name    => %w(periodic_jobs_manage),
+        :name    => %w(periodic_jobs_manage user_crontabs_hiera_merge),
         :valid   => [true, 'true', false, 'false'],
         :invalid => ['string', %w(array), { 'ha' => 'sh' }, 3, 2.42, nil],
         :message => '(Unknown type of boolean given|Requires either string to work with)',
       },
       'hash' => {
-        :name    => ['cron_files'],
-        :valid   => ['a'=>{'type'=>'d'}],
-        :invalid => ['string',['array'],3,2.42,true,false,nil],
+        :name    => %w(cron_files user_crontabs),
+        :params  => { :user_crontabs_hiera_merge => false },
+        :valid   => [], # valid hashes are to complex for generic testing.
+        :invalid => ['string', %w(array), 3, 2.42, false, nil],
         :message => 'is not a Hash',
       },
       'hash_nested_array' => {
@@ -612,31 +635,29 @@ describe 'cron' do
         :name    => ['crontab_owner','cron_allow_owner','cron_deny_owner','cron_dir_owner','crontab_group','cron_allow_group','cron_deny_group','cron_dir_group'],
         :valid   => ['valid'],
         :invalid => [['array'],a={'ha'=>'sh'},3,2.42,true,false],
-        :message => 'must be a string',
+        :message => 'is not a string',
       },
     }
 
-    validations.sort.each do |type,var|
+    validations.sort.each do |type, var|
+      mandatory_params = {} if mandatory_params.nil?
       var[:name].each do |var_name|
-
+        var[:params] = {} if var[:params].nil?
         var[:valid].each do |valid|
-          context "with #{var_name} (#{type}) set to valid #{valid} (as #{valid.class})" do
-            let(:params) { validation_params.merge({:"#{var_name}" => valid, }) }
+          context "when #{var_name} (#{type}) is set to valid #{valid} (as #{valid.class})" do
+            let(:params) { [mandatory_params, var[:params], { :"#{var_name}" => valid, }].reduce(:merge) }
             it { should compile }
           end
         end
 
         var[:invalid].each do |invalid|
-          context "with #{var_name} (#{type}) set to invalid #{invalid} (as #{invalid.class})" do
-            let(:params) { validation_params.merge({:"#{var_name}" => invalid, }) }
+          context "when #{var_name} (#{type}) is set to invalid #{invalid} (as #{invalid.class})" do
+            let(:params) { [mandatory_params, var[:params], { :"#{var_name}" => invalid, }].reduce(:merge) }
             it 'should fail' do
-              expect {
-                should contain_class(subject)
-              }.to raise_error(Puppet::Error,/#{var[:message]}/)
+              expect { should contain_class(subject) }.to raise_error(Puppet::Error, /#{var[:message]}/)
             end
           end
         end
-
       end # var[:name].each
     end # validations.sort.each
   end # describe 'variable type and content validations'

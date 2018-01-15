@@ -3,43 +3,45 @@
 # This module manages cron
 #
 class cron (
-  $package_ensure        = 'installed',
-  $package_name          = 'USE_DEFAULTS',
-  $crontab_path          = '/etc/crontab',
-  $crontab_owner         = 'root',
-  $crontab_group         = 'root',
-  $crontab_mode          = '0644',
-  $cron_allow            = 'absent',
-  $cron_deny             = 'present',
-  $cron_allow_path       = '/etc/cron.allow',
-  $cron_allow_owner      = 'root',
-  $cron_allow_group      = 'root',
-  $cron_allow_mode       = '0644',
-  $cron_deny_path        = '/etc/cron.deny',
-  $cron_deny_owner       = 'root',
-  $cron_deny_group       = 'root',
-  $cron_deny_mode        = '0644',
-  $cron_d_path           = '/etc/cron.d',
-  $cron_hourly_path      = '/etc/cron.hourly',
-  $cron_daily_path       = '/etc/cron.daily',
-  $cron_weekly_path      = '/etc/cron.weekly',
-  $cron_monthly_path     = '/etc/cron.monthly',
-  $cron_dir_owner        = 'root',
-  $cron_dir_group        = 'root',
-  $cron_dir_mode         = '0755',
-  $cron_files            = undef,
-  $cron_allow_users      = undef,
-  $cron_deny_users       = undef,
-  $crontab_vars          = undef,
-  $crontab_tasks         = undef,
-  $periodic_jobs_content = undef,
-  $periodic_jobs_manage  = true,
-  $service_enable        = true,
-  $service_ensure        = 'running',
-  $service_name          = 'USE_DEFAULTS',
-  # deprecated
-  $enable_cron           = undef,
-  $ensure_state          = undef,
+  $package_ensure              = 'installed',
+  $package_name                = 'USE_DEFAULTS',
+  $crontab_path                = '/etc/crontab',
+  $crontab_owner               = 'root',
+  $crontab_group               = 'root',
+  $crontab_mode                = '0644',
+  $cron_allow                  = 'absent',
+  $cron_deny                   = 'present',
+  $cron_allow_path             = '/etc/cron.allow',
+  $cron_allow_owner            = 'root',
+  $cron_allow_group            = 'root',
+  $cron_allow_mode             = '0644',
+  $cron_deny_path              = '/etc/cron.deny',
+  $cron_deny_owner             = 'root',
+  $cron_deny_group             = 'root',
+  $cron_deny_mode              = '0644',
+  $cron_d_path                 = '/etc/cron.d',
+  $cron_hourly_path            = '/etc/cron.hourly',
+  $cron_daily_path             = '/etc/cron.daily',
+  $cron_weekly_path            = '/etc/cron.weekly',
+  $cron_monthly_path           = '/etc/cron.monthly',
+  $cron_dir_owner              = 'root',
+  $cron_dir_group              = 'root',
+  $cron_dir_mode               = '0755',
+  $cron_files                  = undef,
+  $cron_allow_users            = undef,
+  $cron_deny_users             = undef,
+  $crontab_vars                = undef,
+  $crontab_tasks               = undef,
+  $periodic_jobs_content       = undef,
+  $periodic_jobs_manage        = true,
+  $service_enable              = true,
+  $service_ensure              = 'running',
+  $service_name                = 'USE_DEFAULTS',
+  $user_crontabs               = undef,
+  $user_crontabs_hiera_merge   = true,
+  # deprecate
+  $enable_cron                 = undef,
+  $ensure_state                = undef,
 ) {
 
   if $enable_cron != undef {
@@ -116,6 +118,21 @@ class cron (
     }
   }
 
+  $user_crontabs_hiera_merge_bool = str2bool($user_crontabs_hiera_merge)
+
+  if $user_crontabs != undef {
+    case $user_crontabs_hiera_merge_bool {
+      true: {
+        # Hash crontabs from various hiera hierarchies
+        $user_crontabs_real = hiera_hash('cron::user_crontabs', undef)
+      }
+      default: { $user_crontabs_real = $user_crontabs }
+    }
+    validate_hash($user_crontabs_real)
+  } else {
+    $user_crontabs_real = undef
+  }
+
   $periodic_jobs_manage_bool = str2bool($periodic_jobs_manage)
 
   if $periodic_jobs_manage_bool == true {
@@ -183,14 +200,14 @@ class cron (
   validate_absolute_path($cron_weekly_path)
   validate_absolute_path($cron_monthly_path)
 
-  if is_string($cron_allow_group) == false { fail('cron::cron_allow_group must be a string') }
-  if is_string($cron_allow_owner) == false { fail('cron::cron_allow_owner must be a string') }
-  if is_string($cron_deny_group)  == false { fail('cron::cron_deny_group must be a string') }
-  if is_string($cron_deny_owner)  == false { fail('cron::cron_deny_owner must be a string') }
-  if is_string($cron_dir_group)   == false { fail('cron::cron_dir_group must be a string') }
-  if is_string($cron_dir_owner)   == false { fail('cron::cron_dir_owner must be a string') }
-  if is_string($crontab_group)    == false { fail('cron::crontab_group must be a string') }
-  if is_string($crontab_owner)    == false { fail('cron::crontab_owner must be a string') }
+  if is_string($cron_allow_group) == false { fail('cron::cron_allow_group is not a string') }
+  if is_string($cron_allow_owner) == false { fail('cron::cron_allow_owner is not a string') }
+  if is_string($cron_deny_group)  == false { fail('cron::cron_deny_group is not a string') }
+  if is_string($cron_deny_owner)  == false { fail('cron::cron_deny_owner is not a string') }
+  if is_string($cron_dir_group)   == false { fail('cron::cron_dir_group is not a string') }
+  if is_string($cron_dir_owner)   == false { fail('cron::cron_dir_owner is not a string') }
+  if is_string($crontab_group)    == false { fail('cron::crontab_group is not a string') }
+  if is_string($crontab_owner)    == false { fail('cron::crontab_owner is not a string') }
 
   validate_re($crontab_mode, '^[0-7]{4}$',
     "cron::crontab_mode is <${crontab_mode}> and must be a valid four digit mode in octal notation.")
@@ -200,7 +217,6 @@ class cron (
     "cron::cron_allow_mode is <${cron_allow_mode}> and must be a valid four digit mode in octal notation.")
   validate_re($cron_deny_mode, '^[0-7]{4}$',
     "cron::cron_deny_mode is <${cron_deny_mode}> and must be a valid four digit mode in octal notation.")
-
   # End of validation
 
   file { 'cron_allow':
@@ -290,5 +306,9 @@ class cron (
     name      => $service_name_real,
     require   => File['crontab'],
     subscribe => File['crontab'],
+  }
+
+  if $user_crontabs_real != undef {
+    create_resources(cron::user::crontab, $user_crontabs_real)
   }
 }
