@@ -256,8 +256,8 @@ class cron (
   package { $package_name_array:
     ensure => $package_ensure,
     before => [
-      File[cron_allow],
-      File[cron_deny],
+      Concat[$cron_allow_path],
+      Concat[$cron_deny_path],
       File[crontab],
       File[cron_d],
       File[cron_hourly],
