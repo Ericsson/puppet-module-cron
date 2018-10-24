@@ -1,3 +1,11 @@
+## 2018-10-24 - Release 2.3.2
+### Summary
+Support Puppet 6
+
+## 2018-09-26 - Release 2.3.1
+### Summary
+Support Puppet 5
+
 ## 2018-01-15 - Release 2.3.0
 ### Summary
 Add support for management of User crontabs

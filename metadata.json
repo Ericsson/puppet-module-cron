@@ -1,6 +1,6 @@
 {
   "name": "ericsson-cron",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "author": "Ericsson",
   "summary": "Manage cron",
   "description": "Manage cron",
