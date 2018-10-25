@@ -173,9 +173,17 @@ class cron (
   }
   if $cron_allow_users != undef {
     validate_array($cron_allow_users)
+    cron::allow_deny_fragment { 'Initial cron.allow users':
+      type  => 'allow',
+      users => $cron_allow_users,
+    }
   }
   if $cron_deny_users != undef {
     validate_array($cron_deny_users)
+    cron::allow_deny_fragment { 'Initial cron.deny users':
+      type  => 'deny',
+      users => $cron_deny_users,
+    }
   }
 
   if $crontab_tasks != undef {
@@ -219,29 +227,37 @@ class cron (
     "cron::cron_deny_mode is <${cron_deny_mode}> and must be a valid four digit mode in octal notation.")
   # End of validation
 
-  file { 'cron_allow':
+  # Initialize cron.allow
+  concat { $cron_allow_path:
     ensure  => $cron_allow,
-    path    => $cron_allow_path,
     owner   => $cron_allow_owner,
     group   => $cron_allow_group,
     mode    => $cron_allow_mode,
-    content => template('cron/cron_allow.erb'),
+  }
+  concat::fragment { "${cron_allow_path} header":
+    target => $cron_allow_path,
+    order  => '01',
+    content => template('cron/_cron_allow_deny_header.erb'),
   }
 
-  file { 'cron_deny':
+  # Initialize cron.deny
+  concat { $cron_deny_path:
     ensure  => $cron_deny,
-    path    => $cron_deny_path,
     owner   => $cron_deny_owner,
     group   => $cron_deny_group,
     mode    => $cron_deny_mode,
-    content => template('cron/cron_deny.erb'),
+  }
+  concat::fragment { "${cron_deny_path} header":
+    target => $cron_deny_path,
+    order  => '01',
+    content => template('cron/_cron_allow_deny_header.erb'),
   }
 
   package { $package_name_array:
     ensure => $package_ensure,
     before => [
-      File[cron_allow],
-      File[cron_deny],
+      Concat[$cron_allow_path],
+      Concat[$cron_deny_path],
       File[crontab],
       File[cron_d],
       File[cron_hourly],
