@@ -60,6 +60,14 @@ describe 'cron' do
         :service_name => 'crond',
         :crontab      => crontab_default,
       },
+    'RedHat 7' =>
+      {
+        :osfamily     => 'RedHat',
+        :osrelease    => '7.3',
+        :package_name => 'crontabs',
+        :service_name => 'crond',
+        :crontab      => crontab_default,
+      },
     'Suse 10' =>
       {
         :osfamily     => 'Suse',
