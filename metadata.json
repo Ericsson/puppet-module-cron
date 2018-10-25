@@ -1,6 +1,6 @@
 {
   "name": "ericsson-cron",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "author": "Ericsson",
   "summary": "Manage cron",
   "description": "Manage cron",
@@ -23,17 +23,11 @@
     },
     {
       "operatingsystem": "SLES",
-      "operatingsystemrelease": [
-        "10",
-        "11",
-        "12"
-      ]
+      "operatingsystemrelease": ["10","11","12"]
     },
     {
       "operatingsystem": "Ubuntu",
-      "operatingsystemrelease": [
-        "12.04"
-      ]
+      "operatingsystemrelease": ["12.04"]
     }
   ],
   "requirements": [

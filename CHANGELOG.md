@@ -1,3 +1,7 @@
+## 2018-10-25 - Release 2.4.0
+### Summary
+Add support for EL7
+
 ## 2018-10-24 - Release 2.3.2
 ### Summary
 Support Puppet 6
